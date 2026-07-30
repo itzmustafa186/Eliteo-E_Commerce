@@ -15,7 +15,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200">
+    <nav className="sticky pt-4 pb-5 top-0 z-50 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto h-16 px-4 md:px-8 flex items-center justify-between">
         {/* Mobile Hamburger */}
         <div className="lg:hidden">
@@ -33,12 +33,21 @@ const Navbar = () => {
           onClick={() => router.push("/")}
           className="cursor-pointer flex-1 lg:flex-none flex justify-center lg:justify-start"
         >
-          <h1
+          {/* <h1
             onClick={() => router.push("/")}
             className="cursor-pointer text-4xl font-bold bg-gradient-to-r from-black via-gray-700 to-yellow-500 bg-clip-text text-transparent"
           >
             Eliteo
-          </h1>
+          </h1> */}
+
+          <Image
+            src="/icon.png"
+            alt="Eliteo Logo"
+            width={120}
+            height={60}
+            priority
+            className="w-auto h-auto"
+          />
         </div>
 
         {/* Desktop Navigation */}

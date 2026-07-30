@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^7.6.3",
+    "axios": "^1.19.0",
+    "browser-image-compression": "^2.0.2",
+    "cloudinary": "^2.10.0",
     "inngest": "^4.13.0",
     "lucide-react": "^1.27.0",
     "mongoose": "^9.8.1",

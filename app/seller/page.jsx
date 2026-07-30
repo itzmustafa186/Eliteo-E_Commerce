@@ -2,19 +2,90 @@
 import React, { useState } from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
+import { useAppContext } from "@/context/AppContext";
+import axios from "axios";
+import toast from "react-hot-toast";
+import imageCompression from "browser-image-compression";
 
 const AddProduct = () => {
-
+  const { getToken } = useAppContext();
   const [files, setFiles] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('Earphone');
+  const [category, setCategory] = useState('Earbuds');
   const [price, setPrice] = useState('');
   const [offerPrice, setOfferPrice] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (loading) return;
+
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("category", category);
+      formData.append("price", price);
+      formData.append("offerPrice", offerPrice);
+
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1200,
+        useWebWorker: true,
+      };
+
+      for (const file of files) {
+        if (!file) continue;
+
+        if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+          toast.error("Only JPG, PNG and WebP images are allowed.");
+          setLoading(false);
+          return;
+        }
+
+        const compressedFile = await imageCompression(file, options);
+
+        // Your backend expects "image"
+        formData.append("images", compressedFile);
+      }
+
+      const token = await getToken();
+
+      const { data } = await axios.post(
+        "/api/product/add",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+console.log(data.message.image);
+
+        setFiles([]);
+        setName("");
+        setDescription("");
+        setCategory("Earbuds");
+        setPrice("");
+        setOfferPrice("");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || error.message
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -86,13 +157,15 @@ const AddProduct = () => {
               onChange={(e) => setCategory(e.target.value)}
               defaultValue={category}
             >
-              <option value="Earphone">Earphone</option>
-              <option value="Headphone">Headphone</option>
-              <option value="Watch">Watch</option>
+              <option value="Earbuds">Earbuds</option>
+              <option value="Headphones">Headphones</option>
+              <option value="Handfrees">Handfrees</option>
               <option value="Smartphone">Smartphone</option>
-              <option value="Laptop">Laptop</option>
-              <option value="Camera">Camera</option>
-              <option value="Accessories">Accessories</option>
+              <option value="Powerbanks">Powerbanks</option>
+              <option value="DataCables">DataCables</option>
+              <option value="Chargers">Chargers</option>
+              <option value="NeckBands">NeckBands</option>
+
             </select>
           </div>
           <div className="flex flex-col gap-1 w-32">
@@ -124,8 +197,40 @@ const AddProduct = () => {
             />
           </div>
         </div>
-        <button type="submit" className="px-8 py-2.5 bg-orange-600 text-white font-medium rounded">
-          ADD
+        <button
+          type="submit"
+          disabled={loading}
+          className={`px-8 py-3 rounded-lg text-white font-semibold transition-all flex items-center justify-center gap-2 ${loading
+            ? "bg-orange-400 cursor-not-allowed"
+            : "bg-orange-600 hover:bg-orange-700"
+            }`}
+        >
+          {loading ? (
+            <>
+              <svg
+                className="w-5 h-5 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  opacity="0.25"
+                />
+                <path
+                  d="M22 12a10 10 0 0 1-10 10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+              </svg>
+              Uploading...
+            </>
+          ) : (
+            "ADD PRODUCT"
+          )}
         </button>
       </form>
       {/* <Footer /> */}

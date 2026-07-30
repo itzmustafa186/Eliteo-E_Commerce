@@ -10,11 +10,14 @@ import { Poppins } from "next/font/google";
 // const outfit = Outfit({ subsets: ['latin'], weight: ["300", "400", "500"] })
 
 export const metadata = {
-  title: "Eliteo - Shazaib",
-  description: "E-Commerce Website ",
+  title: "Eliteo",
+  description: "Premium E-Commerce Store",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  },
 };
-
-
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
