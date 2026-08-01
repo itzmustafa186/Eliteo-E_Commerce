@@ -83,8 +83,10 @@ export async function POST(request) {
                 { status: 400 }
             );
         }
+        console.time("Total");
 
-        // Upload images
+        console.time("Cloudinary Upload");
+
         const uploadResults = await Promise.all(
             files.map(async (file) => {
                 const bytes = await file.arrayBuffer();
@@ -95,8 +97,6 @@ export async function POST(request) {
                         {
                             folder: "eliteo/products",
                             resource_type: "image",
-
-                            // Optimize images
                             transformation: [
                                 {
                                     width: 1200,
@@ -112,8 +112,8 @@ export async function POST(request) {
                             ],
                         },
                         (error, result) => {
-                            if (error) return reject(error);
-                            resolve(result);
+                            if (error) reject(error);
+                            else resolve(result);
                         }
                     );
 
@@ -122,9 +122,10 @@ export async function POST(request) {
             })
         );
 
-        const images = uploadResults.map((item) => item.secure_url);
+        console.timeEnd("Cloudinary Upload");
 
-        // Save product
+        console.time("MongoDB");
+
         const product = await Product.create({
             userId,
             name,
@@ -132,9 +133,13 @@ export async function POST(request) {
             category,
             price,
             offerPrice,
-            image: images,
+            image: uploadResults.map((item) => item.secure_url),
             date: Date.now(),
         });
+
+        console.timeEnd("MongoDB");
+
+        console.timeEnd("Total");
 
         return NextResponse.json(
             {

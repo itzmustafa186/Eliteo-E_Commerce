@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
 import axios from "axios";
 import toast from "react-hot-toast";
-import imageCompression from "browser-image-compression";
 
 const AddProduct = () => {
   const { getToken } = useAppContext();
@@ -33,26 +32,17 @@ const AddProduct = () => {
       formData.append("price", price);
       formData.append("offerPrice", offerPrice);
 
-      const options = {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1200,
-        useWebWorker: true,
-      };
+  
+
+     
 
       for (const file of files) {
         if (!file) continue;
 
-        if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-          toast.error("Only JPG, PNG and WebP images are allowed.");
-          setLoading(false);
-          return;
-        }
-
-        const compressedFile = await imageCompression(file, options);
-
-        // Your backend expects "image"
-        formData.append("images", compressedFile);
+        formData.append("images", file);
       }
+
+      
 
       const token = await getToken();
 
@@ -68,7 +58,7 @@ const AddProduct = () => {
 
       if (data.success) {
         toast.success(data.message);
-console.log(data.message.image);
+        console.timeEnd("Upload Request");
 
         setFiles([]);
         setName("");
