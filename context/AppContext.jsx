@@ -1,6 +1,6 @@
 'use client'
 import { productsDummyData, userDummyData } from "@/assets/assets";
-import { getToken, useAuth, useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -24,55 +24,104 @@ export const AppContextProvider = (props) => {
     const [cartItems, setCartItems] = useState({})
 
     const fetchProductData = async () => {
-        setProducts(productsDummyData)
-    }
-
-    const fetchUserData = async () => {
         try {
-            if (user.publicMetadata.role === "seller") {
-                setIsSeller(true)
-            }else{
-                setIsSeller(false)
-            }
-            const token = await getToken();
-
-            const { data } = await axios.get("/api/user/data", { headers: { Authorization: `Bearer ${token}` } });
+            const { data } = await axios.get("/api/product/list");
             if (data.success) {
-                setUserData(data.user);
-                setCartItems(data.user.CartItems)
+                setProducts(data.products)
             } else {
                 toast.error(data.message)
             }
         } catch (error) {
-            console.log(error);
             toast.error(error.message)
         }
     }
 
-    const addToCart = async (itemId) => {
+    const fetchUserData = async () => {
+        try {
+            const token = await getToken();
 
-        let cartData = structuredClone(cartItems);
+            const { data } = await axios.get("/api/user/data", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            console.log("User Data:", data.user);
+            console.log("Cart:", data.user.CartItems);
+
+            if (data.success) {
+                setUserData(data.user);
+                setCartItems(data.user.cartItems || {});
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const addToCart = async (itemId) => {
+        const cartData = structuredClone(cartItems || {});
+
         if (cartData[itemId]) {
             cartData[itemId] += 1;
-        }
-        else {
+        } else {
             cartData[itemId] = 1;
         }
+
         setCartItems(cartData);
 
-    }
+        // Save guest cart
+        if (!user) {
+            localStorage.setItem("guestCart", JSON.stringify(cartData));
+            toast.success("Item added to cart");
+            return;
+        }
 
+        try {
+            const token = await getToken();
+            await axios.post(
+                "/api/cart/update",
+                { cartData },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            toast.success("Item added");
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
     const updateCartQuantity = async (itemId, quantity) => {
+        const cartData = structuredClone(cartItems || {});
 
-        let cartData = structuredClone(cartItems);
         if (quantity === 0) {
             delete cartData[itemId];
         } else {
             cartData[itemId] = quantity;
         }
-        setCartItems(cartData)
 
-    }
+        setCartItems(cartData);
+
+        // Save guest cart
+        if (!user) {
+            localStorage.setItem("guestCart", JSON.stringify(cartData));
+            return;
+        }
+
+        try {
+            const token = await getToken();
+            await axios.post(
+                "/api/cart/update",
+                { cartData },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
 
     const getCartCount = () => {
         let totalCount = 0;
@@ -86,9 +135,10 @@ export const AppContextProvider = (props) => {
 
     const getCartAmount = () => {
         let totalAmount = 0;
-        for (const items in cartItems) {
-            let itemInfo = products.find((product) => product._id === items);
-            if (cartItems[items] > 0) {
+        for (const items in (cartItems || {})) {
+            const itemInfo = products.find((product) => product._id === items);
+
+            if (itemInfo && cartItems[items] > 0) {
                 totalAmount += itemInfo.offerPrice * cartItems[items];
             }
         }
@@ -104,6 +154,12 @@ export const AppContextProvider = (props) => {
             fetchUserData()
         }
     }, [user])
+    useEffect(() => {
+        if (!user) {
+            const guestCart = JSON.parse(localStorage.getItem("guestCart") || "{}");
+            setCartItems(guestCart);
+        }
+    }, [user]);
 
     const value = {
         user, getToken,
