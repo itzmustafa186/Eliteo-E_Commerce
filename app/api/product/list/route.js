@@ -8,7 +8,9 @@ export async function GET(request) {
     try {
 
         await connectDB();
-        const products = await Product.find({});
+        const products = await Product.find({})
+            .sort({ date: -1 })
+            .lean();
 
         return NextResponse.json({
             success: true,
