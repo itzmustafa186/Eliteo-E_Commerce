@@ -1,9 +1,10 @@
 "use client"
-import { addressDummyData } from "@/assets/assets";
+
 import { useAppContext } from "@/context/AppContext";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 const OrderSummary = () => {
 
   const {
@@ -13,11 +14,15 @@ const OrderSummary = () => {
     getCartAmount,
     cartItems,
     user,
+    setCartItems
   } = useAppContext();
+
   const inputClass =
     "w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100";
   const SHIPPING_FEE = 250;
 
+
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     phone: "",
@@ -49,10 +54,14 @@ const OrderSummary = () => {
       !formData.phone ||
       !formData.street ||
       !formData.city ||
-      !formData.area
+      !formData.area ||
+      !formData.apartment
     ) {
       return toast.error("Please fill all required fields");
     }
+    if (loading) return;
+
+    setLoading(true);
     try {
       const items = Object.keys(cartItems).map((productId) => ({
         product: productId,
@@ -87,7 +96,7 @@ const OrderSummary = () => {
         totalAmount: getCartAmount() + SHIPPING_FEE,
 
         paymentMethod: "Cash on Delivery",
-       
+
       };
 
       const { data } = await axios.post("/api/order/create", orderData);
@@ -95,11 +104,16 @@ const OrderSummary = () => {
       if (data.success) {
         toast.success("Order placed successfully");
         router.push("/orders");
+        localStorage.removeItem("guestCart");
+        router.push("/order-success");
+        setCartItems({});
       } else {
         toast.error(data.message);
       }
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -192,7 +206,8 @@ const OrderSummary = () => {
           name="apartment"
           value={formData.apartment}
           onChange={handleChange}
-          placeholder="Apartment, Suite (Optional)"
+          required
+          placeholder="Apartment, Suite"
           className={inputClass}
         />
 
@@ -256,9 +271,21 @@ const OrderSummary = () => {
       </div>
       <button
         onClick={createOrder}
-        className="mt-6 w-full rounded-xl bg-orange-600 py-4 text-lg font-semibold text-white transition duration-300 hover:bg-orange-700 active:scale-[0.98]"
+        disabled={loading}
+        className={`mt-6 w-full rounded-xl py-4 text-lg font-semibold text-white transition
+    ${loading
+            ? "bg-orange-400 cursor-not-allowed"
+            : "bg-orange-600 hover:bg-orange-700 active:scale-[0.98]"
+          }`}
       >
-        Place Order
+        {loading ? (
+          <span className="flex items-center justify-center gap-2">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            Placing Order...
+          </span>
+        ) : (
+          "Place Order"
+        )}
       </button>
     </div>
   );

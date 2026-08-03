@@ -38,24 +38,7 @@ export async function POST(req) {
             );
         }
 
-        const order = await Order.create({
-            userId: userId || null,
-            isGuest: !userId,
 
-            customer,
-            address,
-
-            items,
-
-            subtotal,
-            shipping: 250,
-            totalAmount,
-
-            paymentMethod: paymentMethod || "Cash on Delivery",
-
-            paymentStatus: "Pending",
-            orderStatus: "Pending",
-        });
         await inngest.send({
             name: "order/created",
             data: {
@@ -75,14 +58,19 @@ export async function POST(req) {
             },
         });
 
-        const user = await User.findById(userId);
-        user.cartItems = {};
-        await user.save();
+        if (userId) {
+            const user = await User.findOne({ userId });
+
+            if (user) {
+                user.cartItems = {};
+                await user.save();
+            }
+        }
         return NextResponse.json(
             {
                 success: true,
                 message: "Order placed successfully",
-                order,
+
             },
             { status: 201 }
         );
