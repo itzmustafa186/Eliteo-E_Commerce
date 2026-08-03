@@ -152,7 +152,7 @@ export const createUserOrder = inngest.createFunction(
       subtotal: event.data.subtotal,
       shipping: 250,
       totalAmount: event.data.totalAmount,
-      date: event.data.date,
+
       paymentMethod: event.data.paymentMethod,
       paymentStatus: "Pending",
       orderStatus: "Pending",

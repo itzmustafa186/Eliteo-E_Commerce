@@ -34,21 +34,23 @@ const Navbar = () => {
         </div>
 
         {/* Logo */}
-        <div
-          onClick={() => router.push("/")}
-          className="cursor-pointer flex-1 lg:flex-none flex justify-center lg:justify-start"
-        >
+        <Link href={"/"}>
+          <div
+
+            className="cursor-pointer flex-1 lg:flex-none flex justify-center lg:justify-start"
+          >
 
 
-          <Image
-            src="/icon.png"
-            alt="Eliteo"
-            width={120}
-            height={40}
-            priority
-            className="bg-white"
-          />
-        </div>
+            <Image
+              src="/icon4.png"
+              alt="Eliteo"
+              width={180}
+              height={100}
+              priority
+
+            />
+          </div>
+        </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden text-xl lg:flex items-center gap-8">
@@ -194,10 +196,12 @@ const Navbar = () => {
           {/* Header */}
           <div className="flex items-center justify-between border-b px-5 py-4">
             <Image
-              src="/icon.png"
+              src="/icon4.png"
               alt="Eliteo"
-              width={110}
-              height={40}
+              width={180}
+              height={100}
+              priority
+
             />
 
             <button

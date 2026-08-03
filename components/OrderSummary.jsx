@@ -1,31 +1,111 @@
+"use client"
 import { addressDummyData } from "@/assets/assets";
 import { useAppContext } from "@/context/AppContext";
 import React, { useEffect, useState } from "react";
-
+import axios from "axios";
+import toast from "react-hot-toast";
 const OrderSummary = () => {
 
-  const { currency, router, getCartCount, getCartAmount } = useAppContext()
-  const [selectedAddress, setSelectedAddress] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const {
+    currency,
+    router,
+    getCartCount,
+    getCartAmount,
+    cartItems,
+    user,
+  } = useAppContext();
+  const inputClass =
+    "w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100";
   const SHIPPING_FEE = 250;
-  const [userAddresses, setUserAddresses] = useState([]);
 
-  const fetchUserAddresses = async () => {
-    setUserAddresses(addressDummyData);
-  }
+  const [formData, setFormData] = useState({
+    email: "",
+    phone: "",
+    country: "Pakistan",
+    firstName: "",
+    lastName: "",
+    street: "",
+    apartment: "",
+    city: "",
+    area: "",
+    postalCode: "",
+    notes: "",
+  });
 
-  const handleAddressSelect = (address) => {
-    setSelectedAddress(address);
-    setIsDropdownOpen(false);
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
+
 
   const createOrder = async () => {
 
-  }
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.street ||
+      !formData.city ||
+      !formData.area
+    ) {
+      return toast.error("Please fill all required fields");
+    }
+    try {
+      const items = Object.keys(cartItems).map((productId) => ({
+        product: productId,
+        quantity: cartItems[productId],
+      }));
 
-  useEffect(() => {
-    fetchUserAddresses();
-  }, [])
+      const orderData = {
+        userId: user?.id || null,
+        isGuest: !user,
+
+        customer: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+        },
+
+        address: {
+          country: formData.country,
+          city: formData.city,
+          area: formData.area,
+          street: formData.street,
+          apartment: formData.apartment,
+          postalCode: formData.postalCode,
+          notes: formData.notes,
+        },
+
+        items,
+
+        subtotal: getCartAmount(),
+        shipping: SHIPPING_FEE,
+        totalAmount: getCartAmount() + SHIPPING_FEE,
+
+        paymentMethod: "Cash on Delivery",
+       
+      };
+
+      const { data } = await axios.post("/api/order/create", orderData);
+
+      if (data.success) {
+        toast.success("Order placed successfully");
+        router.push("/orders");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+
+
+
   return (
     <div className="w-full md:w-[420px] bg-white border rounded-2xl shadow-sm p-6">
       {/* Heading */}
@@ -42,120 +122,141 @@ const OrderSummary = () => {
       {/* Contact */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-800">
-          Contact
+          Contact Information
         </h3>
 
         <input
           type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
           placeholder="Email Address"
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-orange-500"
+          className={inputClass}
         />
 
         <input
           type="tel"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
           placeholder="Phone Number"
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-orange-500"
+          className={inputClass}
         />
       </div>
 
       {/* Delivery */}
-      <div className="space-y-4 mt-8">
+      <div className="mt-8 space-y-4">
+
         <h3 className="text-lg font-semibold text-gray-800">
-          Delivery
+          Delivery Address
         </h3>
 
         <select
-          defaultValue="Pakistan"
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none bg-white focus:border-orange-500"
+          name="country"
+          value={formData.country}
+          onChange={handleChange}
+          className={inputClass}
         >
           <option>Pakistan</option>
         </select>
 
         <div className="grid grid-cols-2 gap-4">
+
           <input
-            type="text"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
             placeholder="First Name"
-            className="rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-orange-500"
+            className={inputClass}
           />
 
           <input
-            type="text"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
             placeholder="Last Name"
-            className="rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-orange-500"
+            className={inputClass}
           />
+
         </div>
 
         <input
-          type="text"
+          name="street"
+          value={formData.street}
+          onChange={handleChange}
           placeholder="Street Address"
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-orange-500"
+          className={inputClass}
         />
 
         <input
-          type="text"
-          placeholder="Apartment, suite, etc. (optional)"
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-orange-500"
+          name="apartment"
+          value={formData.apartment}
+          onChange={handleChange}
+          placeholder="Apartment, Suite (Optional)"
+          className={inputClass}
         />
 
         <div className="grid grid-cols-2 gap-4">
+
           <input
-            type="text"
+            name="city"
+            value={formData.city}
+            onChange={handleChange}
             placeholder="City"
-            className="rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-orange-500"
+            className={inputClass}
           />
 
           <input
-            type="text"
+            name="area"
+            value={formData.area}
+            onChange={handleChange}
             placeholder="Area"
-            className="rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-orange-500"
+            className={inputClass}
           />
+
         </div>
 
         <input
-          type="text"
-          placeholder="Postal Code"
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-orange-500"
+          name="postalCode"
+          value={formData.postalCode}
+          onChange={handleChange}
+          placeholder="Postal Code (optional)"
+          className={inputClass}
         />
 
         <textarea
           rows={4}
-          placeholder="Order Notes (optional)"
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none resize-none focus:border-orange-500"
+          name="notes"
+          value={formData.notes}
+          onChange={handleChange}
+          placeholder="Order Notes (Optional)"
+          className={`${inputClass} resize-none`}
         />
+
       </div>
-
-      {/* Summary */}
-      {/* Summary */}
-      <div className="mt-8 border-t pt-6 space-y-3">
-        <div className="flex justify-between text-gray-600">
-          <span>Items ({getCartCount()})</span>
-          <span>
-            {currency}
-            {getCartAmount()}
-          </span>
-        </div>
+      <div className="mt-8 rounded-xl bg-gray-50 border p-5">
 
         <div className="flex justify-between text-gray-600">
-          <span>Shipping (Standard)</span>
-          <span>
-            {currency}
-            {SHIPPING_FEE}
-          </span>
+          <span>Subtotal</span>
+          <span>{currency}{getCartAmount()}</span>
         </div>
 
-        <div className="flex justify-between text-xl font-bold border-t pt-4">
+        <div className="flex justify-between text-gray-600 mt-3">
+          <span>Shipping</span>
+          <span>{currency}{SHIPPING_FEE}</span>
+        </div>
+
+        <div className="mt-4 border-t pt-4 flex justify-between text-xl font-bold">
           <span>Total</span>
-          <span>
-            {currency}
-            {getCartAmount() + SHIPPING_FEE}
+          <span className="text-orange-600">
+            {currency}{getCartAmount() + SHIPPING_FEE}
           </span>
         </div>
-      </div>
 
-      {/* Place Order */}
+      </div>
       <button
         onClick={createOrder}
-        className="w-full mt-6 rounded-xl bg-orange-600 py-3.5 text-white font-semibold transition hover:bg-orange-700"
+        className="mt-6 w-full rounded-xl bg-orange-600 py-4 text-lg font-semibold text-white transition duration-300 hover:bg-orange-700 active:scale-[0.98]"
       >
         Place Order
       </button>

@@ -3,17 +3,47 @@
 import React from "react";
 import ProductCard from "./ProductCard";
 import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 
 const HomeProducts = ({ products }) => {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col items-center pt-14">
-      <p className="w-full text-2xl font-medium">
-        Popular Products
-      </p>
+    <section className="py-16 lg:py-20">
 
-      <div className="grid w-full grid-cols-2 gap-6 mt-6 pb-14 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      {/* Heading */}
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
+
+        <div>
+          <span className="inline-block rounded-full bg-orange-100 px-4 py-1 text-sm font-semibold text-orange-600">
+            Trending Collection
+          </span>
+
+          <h2 className="mt-4 text-3xl md:text-5xl font-bold text-gray-900">
+            Popular Products
+          </h2>
+
+          <p className="mt-3 max-w-2xl text-gray-500">
+            Discover our best-selling products with premium quality,
+            modern designs, and unbeatable prices.
+          </p>
+        </div>
+
+        <button
+          onClick={() => router.push("/all-products")}
+          className="group flex items-center gap-2 rounded-full border border-orange-200 bg-white px-6 py-3 font-semibold text-orange-600 transition hover:bg-orange-600 hover:text-white"
+        >
+          View All
+          <ArrowRight
+            size={18}
+            className="transition group-hover:translate-x-1"
+          />
+        </button>
+
+      </div>
+
+      {/* Products */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
         {products.map((product) => (
           <ProductCard
             key={product._id.toString()}
@@ -22,13 +52,21 @@ const HomeProducts = ({ products }) => {
         ))}
       </div>
 
-      <button
-        onClick={() => router.push("/all-products")}
-        className="rounded border px-12 py-2.5 text-gray-600 transition hover:bg-gray-100"
-      >
-        See More
-      </button>
-    </div>
+      {/* Bottom Button */}
+      <div className="mt-14 flex justify-center">
+        <button
+          onClick={() => router.push("/all-products")}
+          className="group flex items-center gap-3 rounded-full bg-orange-600 px-8 py-4 text-white font-semibold shadow-lg transition-all duration-300 hover:scale-105 hover:bg-orange-700"
+        >
+          Explore All Products
+          <ArrowRight
+            size={20}
+            className="transition group-hover:translate-x-1"
+          />
+        </button>
+      </div>
+
+    </section>
   );
 };
 

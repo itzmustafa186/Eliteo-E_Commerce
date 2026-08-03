@@ -133,10 +133,7 @@ const orderSchema = new mongoose.Schema(
             ],
             default: "Pending",
         },
-        date:{
-            type:Number,
-            required:true
-        }
+       
 
     },
     {
