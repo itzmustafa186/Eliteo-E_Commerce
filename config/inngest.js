@@ -3,6 +3,7 @@
 import { Inngest } from "inngest";
 import connectDB from "./db";
 import User from "@/models/User";
+import Order from "@/models/order";
 
 export const inngest = new Inngest({
   id: "eliteo",
@@ -120,9 +121,56 @@ export const syncUserDeletion = inngest.createFunction(
   }
 );
 
+// Inngest function to place order
+
+export const createUserOrder = inngest.createFunction(
+  {
+    id: "create-user-order",
+    batchEvents: {
+      maxSize: 5,
+      timeout: "5s",
+    },
+    triggers: [
+      {
+        event: "order/created",
+      },
+    ],
+  },
+
+  async ({ events }) => {
+    await connectDB();
+
+    const orders = events.map((event) => ({
+      userId: event.data.userId,
+      isGuest: event.data.isGuest,
+
+      customer: event.data.customer,
+      address: event.data.address,
+
+      items: event.data.items,
+
+      subtotal: event.data.subtotal,
+      shipping: 250,
+      totalAmount: event.data.totalAmount,
+      date: event.data.date,
+      paymentMethod: event.data.paymentMethod,
+      paymentStatus: "Pending",
+      orderStatus: "Pending",
+    }));
+
+    await Order.insertMany(orders);
+
+    return {
+      success: true,
+      ordersCreated: orders.length,
+    };
+  }
+);
+
 // Export all functions
 export const functions = [
   syncUserCreation,
   syncUserUpdation,
   syncUserDeletion,
+  createUserOrder
 ];
