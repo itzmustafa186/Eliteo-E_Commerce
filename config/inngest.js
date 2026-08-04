@@ -216,6 +216,8 @@ export const createUserOrder = inngest.createFunction(
         )
         .join("");
 
+      console.log("Calling sendEmail...");
+
       await sendEmail({
         to: order.customer.email,
         subject: `Order Confirmed • Eliteo #${order._id}`,
@@ -446,7 +448,7 @@ Thank you for choosing <strong>Eliteo</strong> ❤️
 </div>
 `,
       });
-
+      console.log("sendEmail completed");
       return {
         success: true,
         ordersCreated: createdOrders.length,
