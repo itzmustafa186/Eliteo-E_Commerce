@@ -79,13 +79,33 @@ const Navbar = () => {
             </div>
           </div>
 
-          <Link
-            href="/my-orders"
-            className="relative font-medium text-gray-700 hover:text-black transition group"
-          >
-            My orders
-            <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
-          </Link>
+          {user ? (
+            <>
+              <Link
+                href="/my-orders"
+                className="relative font-medium text-gray-700 hover:text-black transition group"
+              >
+                My Orders
+                <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+              <Link
+                href="/track-order"
+                className="relative font-medium text-gray-700 hover:text-black transition group"
+              >
+                Track Order
+                <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+
+            </>
+          ) : (
+            <Link
+              href="/track-order"
+              className="relative font-medium text-gray-700 hover:text-black transition group"
+            >
+              Track Order
+              <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
+            </Link>
+          )}
 
           <Link
             href="/about"
@@ -256,14 +276,32 @@ const Navbar = () => {
               </div>
             </div>
 
-            <Link
-              href="/my-orders"
-              onClick={() => setSidebarOpen(false)}
-              className="block px-6 py-4 hover:bg-gray-100"
-            >
-              My Orders
-            </Link>
-
+            {user ? (
+              <>
+                <Link
+                  href="/my-orders"
+                  onClick={() => setSidebarOpen(false)}
+                  className="block px-6 py-4 hover:bg-gray-100"
+                >
+                  My Orders
+                </Link>
+                <Link
+                  href="/track-order"
+                  onClick={() => setSidebarOpen(false)}
+                  className="block px-6 py-4 hover:bg-gray-100"
+                >
+                  Track Order
+                </Link>
+              </>
+            ) : (
+              <Link
+                href="/track-order"
+                onClick={() => setSidebarOpen(false)}
+                className="block px-6 py-4 hover:bg-gray-100"
+              >
+                Track Order
+              </Link>
+            )}
             <Link
               href="/about"
               onClick={() => setSidebarOpen(false)}

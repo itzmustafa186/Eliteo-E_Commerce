@@ -3,31 +3,33 @@ import Product from "@/models/product";
 import ProductDetailsClient from "@/components/ProductDetailsClient";
 import { notFound } from "next/navigation";
 
-
+export const revalidate = 300;
 
 export default async function ProductPage({ params }) {
     const { id } = await params;
-    console.time("page");
 
     await connectDB();
 
-    console.time("product");
-    const productData = await Product.findById(id).lean();
-    console.timeEnd("product");
+    const productData = await Product.findById(id)
+        .select("name description image offerPrice price category")
+        .lean();
 
-    console.time("featured");
-    const featuredProducts = await Product.find({})
-        .sort({ date: -1 })
+    if (!productData) {
+        notFound();
+    }
+
+    const featuredProducts = await Product.find({
+        category: productData.category,
+        _id: { $ne: productData._id },
+    })
+
         .limit(5)
         .lean();
-    console.timeEnd("featured");
-
-    console.timeEnd("page");
 
     return (
         <ProductDetailsClient
-            productData={JSON.parse(JSON.stringify(productData))}
-            featuredProducts={JSON.parse(JSON.stringify(featuredProducts))}
+            productData={productData}
+            featuredProducts={featuredProducts}
         />
     );
 }

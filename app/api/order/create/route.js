@@ -39,25 +39,23 @@ export async function POST(req) {
         }
 
 
-        await inngest.send({
-            name: "order/created",
-            data: {
-                userId: userId || null,
-                isGuest: !userId,
+        const order = await Order.create({
+            userId: userId || null,
+            isGuest: !userId,
 
-                customer,
-                address,
+            customer,
+            address,
 
-                items,
+            items,
 
-                subtotal,
-                totalAmount,
+            subtotal,
+            shipping: 250,
+            totalAmount,
 
-                paymentMethod,
-                date: Date.now()
-            },
+            paymentMethod,
+            paymentStatus: "Pending",
+            orderStatus: "Pending",
         });
-
         if (userId) {
             const user = await User.findOne({ _id: userId });
 
@@ -66,10 +64,17 @@ export async function POST(req) {
                 await user.save();
             }
         }
+        await inngest.send({
+            name: "order/created",
+            data: {
+                orderId: order._id,
+            },
+        });
         return NextResponse.json(
             {
                 success: true,
                 message: "Order placed successfully",
+                order
 
             },
             { status: 201 }

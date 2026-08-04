@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { assets } from "@/assets/assets";
 import { useAppContext } from "@/context/AppContext";
@@ -15,7 +15,49 @@ const ProductDetailsClient = ({ productData, featuredProducts }) => {
     if (!productData) {
         return <p>Product not found.</p>;
     }
+    const currentImage = useMemo(
+        () => mainImage || productData.image[0],
+        [mainImage, productData.image]
+    );
 
+
+    const handleAddToCart = useCallback(() => {
+        addToCart(productData._id);
+    }, [addToCart, productData._id]);
+
+    const handleBuyNow = useCallback(() => {
+        addToCart(productData._id);
+        router.push("/cart");
+    }, [addToCart, router, productData._id]);
+
+    const thumbnails = useMemo(
+        () =>
+            productData.image.map((image, index) => (
+                <div
+                    key={index}
+                    onClick={() => setMainImage(image)}
+                    className={`cursor-pointer rounded-lg overflow-hidden border-2 transition ${currentImage === image
+                        ? "border-orange-500"
+                        : "border-transparent"
+                        }`}
+                >
+                    <Image
+                        src={image}
+                        alt={productData.name}
+                        width={120}
+                        height={120}
+                        loading="lazy"
+                        className="w-full h-auto object-cover"
+                    />
+                </div>
+            )),
+        [productData.image, currentImage, productData.name]
+
+    );
+
+    useEffect(() => {
+        router.prefetch("/cart");
+    }, [router]);
     return (<>
         <Navbar />
         <div className="px-6 md:px-16 lg:px-32 pt-14 space-y-10">
@@ -23,31 +65,19 @@ const ProductDetailsClient = ({ productData, featuredProducts }) => {
                 <div className="px-5 lg:px-16 xl:px-20">
                     <div className="rounded-lg overflow-hidden bg-gray-500/10 mb-4">
                         <Image
-                            src={mainImage || productData.image[0]}
-                            alt="alt"
-                            className="w-full h-auto object-cover mix-blend-multiply"
-                            width={1280}
-                            height={720}
+                            src={currentImage}
+                            alt={productData.name}
+                            width={900}
+                            height={900}
+                            priority
+                            quality={85}
+                            sizes="(max-width:768px)100vw,50vw"
+                            className="w-full h-auto object-contain transition-all duration-300"
                         />
                     </div>
 
                     <div className="grid grid-cols-4 gap-4">
-                        {productData.image.map((image, index) => (
-                            <div
-                                key={index}
-                                onClick={() => setMainImage(image)}
-                                className="cursor-pointer rounded-lg overflow-hidden bg-gray-500/10"
-                            >
-                                <Image
-                                    src={image}
-                                    alt="alt"
-                                    className="w-full h-auto object-cover mix-blend-multiply"
-                                    width={1280}
-                                    height={720}
-                                />
-                            </div>
-
-                        ))}
+                        {thumbnails}
                     </div>
                 </div>
 
@@ -101,10 +131,10 @@ const ProductDetailsClient = ({ productData, featuredProducts }) => {
                     </div>
 
                     <div className="flex items-center mt-10 gap-4">
-                        <button onClick={() => addToCart(productData._id)} className="w-full py-3.5 bg-gray-100 text-gray-800/80 hover:bg-gray-200 transition">
+                        <button onClick={handleAddToCart} className="w-full py-3.5 bg-gray-100 text-gray-800/80 hover:bg-gray-200 transition">
                             Add to Cart
                         </button>
-                        <button onClick={() => { addToCart(productData._id); router.push('/cart') }} className="w-full py-3.5 bg-orange-500 text-white hover:bg-orange-600 transition">
+                        <button onClick={handleBuyNow} className="w-full py-3.5 bg-orange-500 text-white hover:bg-orange-600 transition">
                             Buy now
                         </button>
                     </div>
