@@ -452,8 +452,8 @@ Thank you for choosing <strong>Eliteo</strong> ❤️
         ordersCreated: createdOrders.length,
       };
     }
-);
-
+  }
+)
 // Export all functions
 export const functions = [
   syncUserCreation,
