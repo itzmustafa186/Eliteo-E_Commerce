@@ -1,5 +1,6 @@
 // src/inngest/client.js
-
+import { resend } from "@/config/resend";
+import Product from "@/models/product";
 import { Inngest } from "inngest";
 import connectDB from "./db";
 import User from "@/models/User";
@@ -156,13 +157,88 @@ export const createUserOrder = inngest.createFunction(
       paymentMethod: event.data.paymentMethod,
       paymentStatus: "Pending",
       orderStatus: "Pending",
+
+      date: event.data.date,
     }));
 
-    await Order.insertMany(orders);
+    // Insert ONLY ONCE
+    const createdOrders = await Order.insertMany(orders);
+
+    // Send email for each order
+    for (const order of createdOrders) {
+      const products = await Promise.all(
+        order.items.map(async (item) => {
+          const product = await Product.findById(item.product).lean();
+
+          return {
+            name: product?.name || "Product",
+            image: product?.image?.[0] || "",
+            price: product?.offerPrice || 0,
+            quantity: item.quantity,
+          };
+        })
+      );
+
+      await resend.emails.send({
+        from: process.env.EMAIL_FROM,
+        to: order.customer.email,
+        subject: "Your Eliteo Order Confirmation",
+
+        html: `
+      <div style="font-family:Arial,sans-serif;padding:30px;background:#f7f7f7">
+        <div style="max-width:650px;margin:auto;background:white;border-radius:12px;padding:30px">
+
+          <h2 style="color:#f97316;">🎉 Thank you for shopping with Eliteo</h2>
+
+          <p>Hi <strong>${order.customer.firstName}</strong>,</p>
+
+          <p>Your order has been placed successfully.</p>
+
+          <hr>
+
+          <h3>Ordered Products</h3>
+
+          ${products
+            .map(
+              (product) => `
+                <div style="display:flex;gap:15px;margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:15px;">
+                  <img
+                    src="${product.image}"
+                    width="90"
+                    height="90"
+                    style="border-radius:10px;object-fit:cover;"
+                  />
+
+                  <div>
+                    <h4 style="margin:0">${product.name}</h4>
+                    <p>Quantity: ${product.quantity}</p>
+                    <p>Price: Rs ${product.price}</p>
+                  </div>
+                </div>
+              `
+            )
+            .join("")}
+
+          <hr>
+
+          <p><strong>Subtotal:</strong> Rs ${order.subtotal}</p>
+          <p><strong>Shipping:</strong> Rs ${order.shipping}</p>
+
+          <h2>Total: Rs ${order.totalAmount}</h2>
+
+          <p>We'll notify you once your order is confirmed.</p>
+
+          <p>❤️ Team Eliteo</p>
+
+        </div>
+      </div>
+    `,
+      });
+    }
 
     return {
       success: true,
-      ordersCreated: orders.length,
+      ordersCreated: createdOrders.length,
     };
   }
 );
