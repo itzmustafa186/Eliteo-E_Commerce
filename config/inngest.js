@@ -140,6 +140,7 @@ export const createUserOrder = inngest.createFunction(
   },
 
   async ({ events }) => {
+    console.log("🔥 createUserOrder started");
     await connectDB();
 
     const orders = events.map((event) => ({

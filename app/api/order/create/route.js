@@ -59,7 +59,7 @@ export async function POST(req) {
         });
 
         if (userId) {
-            const user = await User.findOne({ userId });
+            const user = await User.findOne({ _id: userId });
 
             if (user) {
                 user.cartItems = {};
