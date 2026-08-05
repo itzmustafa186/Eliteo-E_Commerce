@@ -11,7 +11,8 @@ export default async function AllProducts() {
     const products = await Product.find({})
         .sort({ date: -1 })
         .lean();
-
+    console.log("Products Count:", products.length);
+    console.log(products);
     return (
         <>
             <Navbar />

@@ -145,9 +145,7 @@ export const AppContextProvider = (props) => {
         return Math.floor(totalAmount * 100) / 100;
     }
 
-    useEffect(() => {
-        fetchProductData()
-    }, [])
+  
 
     useEffect(() => {
         if (user) {

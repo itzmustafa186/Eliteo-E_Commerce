@@ -122,9 +122,6 @@ export async function POST(request) {
             })
         );
 
-        console.timeEnd("Cloudinary Upload");
-
-        console.time("MongoDB");
 
         const product = await Product.create({
             userId,
@@ -137,9 +134,9 @@ export async function POST(request) {
             date: Date.now(),
         });
 
-        console.timeEnd("MongoDB");
-
-        console.timeEnd("Total");
+        revalidatePath("/");
+        revalidatePath("/all-products");
+        revalidatePath("/seller/products");
 
         return NextResponse.json(
             {
