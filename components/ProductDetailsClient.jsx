@@ -59,7 +59,7 @@ const ProductDetailsClient = ({ productData, featuredProducts }) => {
         router.prefetch("/cart");
     }, [router]);
     return (<>
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="px-6 md:px-16 lg:px-32 pt-14 space-y-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
                 <div className="px-5 lg:px-16 xl:px-20">
@@ -161,7 +161,7 @@ const ProductDetailsClient = ({ productData, featuredProducts }) => {
                 </button>
             </div>
         </div>
-        <Footer />
+        {/* <Footer /> */}
     </>
 
     )

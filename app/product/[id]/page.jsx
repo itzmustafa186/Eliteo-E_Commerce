@@ -3,7 +3,7 @@ import Product from "@/models/product";
 import ProductDetailsClient from "@/components/ProductDetailsClient";
 import { notFound } from "next/navigation";
 
-export const revalidate = 300;
+
 
 export default async function ProductPage({ params }) {
     const { id } = await params;
