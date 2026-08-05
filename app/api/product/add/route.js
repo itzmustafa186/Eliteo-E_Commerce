@@ -3,6 +3,7 @@ import authSeller from "@/lib/authSeller";
 import Product from "@/models/product";
 import { auth } from "@clerk/nextjs/server";
 import { v2 as cloudinary } from "cloudinary";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 cloudinary.config({
