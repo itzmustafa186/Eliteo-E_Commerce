@@ -25,8 +25,8 @@ const Navbar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm " >
-      <div className="max-w-7xl mx-auto h-24  lg:px-8 flex items-center justify-between">
+   <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/80 shadow-sm backdrop-blur-xl">
+  <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Mobile Hamburger */}
         <div className="lg:hidden">
           <button
