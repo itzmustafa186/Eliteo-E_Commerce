@@ -24,6 +24,9 @@ const MyOrders = ({ orders }) => {
         Delivered: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
         Cancelled: "bg-rose-500/10 text-rose-600 border-rose-500/20",
     };
+console.log(orders);
+
+    
 
     return (
         <div className="bg-[#f8f9fa] min-h-screen text-slate-900 flex flex-col antialiased">
@@ -74,7 +77,7 @@ const MyOrders = ({ orders }) => {
                                     <div className="px-6 py-4 bg-slate-50/50 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                         <div className="flex items-center gap-4">
                                             <span className="font-semibold text-slate-900 text-sm tracking-wide">
-                                                Order #{order._id.slice(-8)}
+                                                Order #{order.orderNumber}
                                             </span>
                                             <span className="text-slate-300">|</span>
                                             <div className="flex items-center gap-1.5 text-slate-500 text-xs font-medium">
@@ -105,7 +108,7 @@ const MyOrders = ({ orders }) => {
                                                     <div className="flex items-center gap-4">
                                                         <div className="h-16 w-16 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden flex-shrink-0 relative">
                                                             <Image
-                                                                src={item.product.image[0]}
+                                                                src={item.product.images[0]}
                                                                 alt=""
                                                                 width={100}
                                                                 height={100}

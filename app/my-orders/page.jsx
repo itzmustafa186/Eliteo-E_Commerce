@@ -1,5 +1,6 @@
 import connectDB from "@/config/db";
 import Order from "@/models/order";
+import Product from "@/models/product"; // add this
 import { auth } from "@clerk/nextjs/server";
 import MyOrders from "@/components/MyOrders";
 
@@ -14,19 +15,25 @@ export default async function OrdersPage() {
         .sort({ createdAt: -1 })
         .lean();
 
+
     const serializedOrders = orders.map((order) => ({
         ...order,
         _id: order._id.toString(),
+
         createdAt: new Date(order.createdAt).toLocaleDateString("en-US"),
+
         updatedAt: order.updatedAt.toISOString(),
 
         items: order.items.map((item) => ({
             ...item,
             _id: item._id.toString(),
-            product: {
-                ...item.product,
-                _id: item.product._id.toString(),
-            },
+
+            product: item.product
+                ? {
+                    ...item.product,
+                    _id: item.product._id.toString(),
+                }
+                : null,
         })),
     }));
 

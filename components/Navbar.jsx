@@ -8,6 +8,7 @@ import { assets, CartIcon } from "@/assets/assets";
 import { useAppContext } from "@/context/AppContext";
 import { useClerk, UserButton } from "@clerk/nextjs";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
 const Navbar = () => {
   const { isSeller, router, user, getCartCount } = useAppContext();
   const { openSignIn } = useClerk();
@@ -18,11 +19,14 @@ const Navbar = () => {
     "Shoes",
     "Beauty",
   ];
+
+
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm " >
-      <div className="max-w-7xl mx-auto h-28 px-5 lg:px-8 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto h-24  lg:px-8 flex items-center justify-between">
         {/* Mobile Hamburger */}
         <div className="lg:hidden">
           <button
@@ -44,7 +48,7 @@ const Navbar = () => {
             <Image
               src="/icon4.png"
               alt="Eliteo"
-              width={180}
+              width={160}
               height={100}
               priority
 
@@ -53,7 +57,7 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden text-xl lg:flex items-center gap-8">
+        <div className="hidden  lg:flex items-center gap-8">
           <Link
             href="/"
             className="relative font-medium text-gray-700 hover:text-black transition group"

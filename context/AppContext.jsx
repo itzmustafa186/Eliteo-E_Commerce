@@ -38,6 +38,9 @@ export const AppContextProvider = (props) => {
 
     const fetchUserData = async () => {
         try {
+            if (user.publicMetadata.role === "seller") {
+                setIsSeller(true)
+            }
             const token = await getToken();
 
             const { data } = await axios.get("/api/user/data", {
@@ -135,17 +138,25 @@ export const AppContextProvider = (props) => {
 
     const getCartAmount = () => {
         let totalAmount = 0;
-        for (const items in (cartItems || {})) {
-            const itemInfo = products.find((product) => product._id === items);
 
-            if (itemInfo && cartItems[items] > 0) {
-                totalAmount += itemInfo.offerPrice * cartItems[items];
+        console.log("Products:", products);
+        console.log("Cart:", cartItems);
+
+        for (const itemId in (cartItems || {})) {
+            const itemInfo = products.find((product) => product._id === itemId);
+
+            console.log(itemId, itemInfo);
+
+            if (itemInfo && cartItems[itemId] > 0) {
+                totalAmount += itemInfo.offerPrice * cartItems[itemId];
             }
         }
-        return Math.floor(totalAmount * 100) / 100;
-    }
 
-  
+        console.log("Total:", totalAmount);
+
+        return totalAmount;
+    };
+
 
     useEffect(() => {
         if (user) {
@@ -159,15 +170,33 @@ export const AppContextProvider = (props) => {
         }
     }, [user]);
 
+    useEffect(() => {
+        fetchProductData()
+    })
     const value = {
-        user, getToken,
-        currency, router,
-        isSeller, setIsSeller,
-        userData, fetchUserData,
+        user,
+        getToken,
 
-        cartItems, setCartItems,
-        addToCart, updateCartQuantity,
-        getCartCount, getCartAmount
+        currency,
+        router,
+
+        products,
+        fetchProductData,
+
+        isSeller,
+        setIsSeller,
+
+        userData,
+        fetchUserData,
+
+        cartItems,
+        setCartItems,
+
+        addToCart,
+        updateCartQuantity,
+
+        getCartCount,
+        getCartAmount,
     }
 
     return (

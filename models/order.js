@@ -13,6 +13,12 @@ const orderSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        
+        orderNumber: {
+            type: String,
+            unique: true,
+            required: true,
+        },
 
         // Customer Information
         customer: {
@@ -71,7 +77,7 @@ const orderSchema = new mongoose.Schema(
             {
                 product: {
                     type: mongoose.Schema.Types.ObjectId,
-                    ref: "product",
+                    ref: "Product",
                     required: true,
                 },
                 quantity: {
@@ -133,7 +139,7 @@ const orderSchema = new mongoose.Schema(
             ],
             default: "Pending",
         },
-       
+
 
     },
     {

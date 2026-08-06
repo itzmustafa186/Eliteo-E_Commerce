@@ -9,15 +9,22 @@ import FeaturedProduct from "@/components/FeaturedProduct";
 import Banner from "@/components/Banner";
 import NewsLetter from "@/components/NewsLetter";
 
+export const revalidate = 60;
+
 export default async function Home() {
+
+
   await connectDB();
 
-  const products = (await Product.find({})
-    .sort({ date: -1 })
-    .lean()).map((product) => ({
-      ...product,
-      _id: product._id.toString(),
-    }));
+  const products = (await Product.find({
+    isActive: true,
+  })
+    .sort({ createdAt: -1 })
+    .lean()
+  ).map((product) => ({
+    ...product,
+    _id: product._id.toString(),
+  }));
 
   return (
     <>

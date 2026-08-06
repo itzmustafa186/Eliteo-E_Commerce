@@ -5,6 +5,62 @@ import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+const categories = {
+  Earbuds: [
+    "Gaming",
+    "Wireless",
+    "ANC",
+    "TWS",
+  ],
+  Headphones: [
+    "Gaming",
+    "Studio",
+    "Bluetooth",
+    "Noise Cancelling",
+  ],
+  Chargers: [
+    "20W",
+    "33W",
+    "45W",
+    "65W",
+  ],
+  Cables: [
+    "Type-C",
+    "Lightning",
+    "Micro USB",
+    "Fast Charging",
+  ],
+  PowerBanks: [
+    "10000mAh",
+    "20000mAh",
+    "Wireless",
+    "Fast Charging",
+  ],
+  MobileCases: [
+    "Silicone",
+    "Transparent",
+    "Shockproof",
+    "Leather",
+  ],
+  ScreenProtectors: [
+    "Tempered Glass",
+    "Privacy Glass",
+    "Matte",
+  ],
+  SmartWatches: [
+    "Fitness",
+    "AMOLED",
+    "Calling",
+    "Sports",
+  ],
+
+  GamingAccessories: [
+    "Triggers",
+    "Cooling Fan",
+    "Gamepad",
+  ],
+};
 
 const AddProduct = () => {
   const { getToken } = useAppContext();
@@ -14,7 +70,11 @@ const AddProduct = () => {
   const [category, setCategory] = useState('Earbuds');
   const [price, setPrice] = useState('');
   const [offerPrice, setOfferPrice] = useState('');
+  const [subCategory, setSubCategory] = useState("");
+  const [brand, setBrand] = useState("");
+  const [stock, setStock] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,20 +89,17 @@ const AddProduct = () => {
       formData.append("name", name);
       formData.append("description", description);
       formData.append("category", category);
+      formData.append("subCategory", subCategory);
+      formData.append("brand", brand);
       formData.append("price", price);
       formData.append("offerPrice", offerPrice);
-
-  
-
-     
+      formData.append("stock", stock);
 
       for (const file of files) {
-        if (!file) continue;
-
-        formData.append("images", file);
+        if (file) formData.append("images", file);
       }
 
-      
+
 
       const token = await getToken();
 
@@ -66,6 +123,10 @@ const AddProduct = () => {
         setCategory("Earbuds");
         setPrice("");
         setOfferPrice("");
+        setBrand("");
+        setSubCategory("");
+        setStock("");
+        router.refresh();
       } else {
         toast.error(data.message);
       }
@@ -141,21 +202,47 @@ const AddProduct = () => {
             <label className="text-base font-medium" htmlFor="category">
               Category
             </label>
+
             <select
               id="category"
               className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-              onChange={(e) => setCategory(e.target.value)}
-              defaultValue={category}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                
+              }}
+              value={category}
             >
-              <option value="Earbuds">Earbuds</option>
-              <option value="Headphones">Headphones</option>
-              <option value="Handfrees">Handfrees</option>
-              <option value="Smartphone">Smartphone</option>
-              <option value="Powerbanks">Powerbanks</option>
-              <option value="DataCables">DataCables</option>
-              <option value="Chargers">Chargers</option>
-              <option value="NeckBands">NeckBands</option>
+              <option value="">Select Category</option>
 
+              {Object.keys(categories).map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+
+
+          <div className="flex flex-col gap-1 w-52">
+            <label className="text-base font-medium" htmlFor="subCategory">
+              Sub Category
+            </label>
+
+            <select
+              id="subCategory"
+              className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
+              value={subCategory}
+              onChange={(e) => setSubCategory(e.target.value)}
+              disabled={!category}
+            >
+              <option value="">Select Sub Category</option>
+
+              {category &&
+                categories[category].map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
             </select>
           </div>
           <div className="flex flex-col gap-1 w-32">
@@ -166,6 +253,7 @@ const AddProduct = () => {
               id="product-price"
               type="number"
               placeholder="0"
+              step="0.01"
               className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
               onChange={(e) => setPrice(e.target.value)}
               value={price}
@@ -180,10 +268,38 @@ const AddProduct = () => {
               id="offer-price"
               type="number"
               placeholder="0"
+              step="0.01"
               className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
               onChange={(e) => setOfferPrice(e.target.value)}
               value={offerPrice}
               required
+            />
+          </div>
+          <div className="flex flex-col gap-1 w-52">
+            <label className="text-base font-medium">
+              Brand
+            </label>
+
+            <input
+              type="text"
+              placeholder="Apple, Samsung..."
+              className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col gap-1 w-32">
+            <label className="text-base font-medium">
+              Stock
+            </label>
+
+            <input
+              type="number"
+              min="0"
+              placeholder="100"
+              className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
             />
           </div>
         </div>

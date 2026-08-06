@@ -1,6 +1,7 @@
 import connectDB from "@/config/db";
 import { inngest } from "@/config/inngest";
 import Order from "@/models/order";
+import Product from "@/models/product";
 import User from "@/models/User";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -10,19 +11,15 @@ export async function POST(req) {
         await connectDB();
 
         const { userId } = await auth();
-
         const body = await req.json();
 
         const {
             customer,
             address,
             items,
-            subtotal,
-            totalAmount,
             paymentMethod,
         } = body;
 
-        // Validation
         if (
             !customer ||
             !address ||
@@ -38,10 +35,55 @@ export async function POST(req) {
             );
         }
 
+        const SHIPPING_FEE = 250;
+
+        let subtotal = 0;
+
+        for (const item of items) {
+            const product = await Product.findById(item.product);
+
+            if (!product) {
+                return NextResponse.json(
+                    {
+                        success: false,
+                        message: "Product not found.",
+                    },
+                    { status: 404 }
+                );
+            }
+
+            if (!product.isActive) {
+                return NextResponse.json(
+                    {
+                        success: false,
+                        message: `${product.name} is unavailable.`,
+                    },
+                    { status: 400 }
+                );
+            }
+
+            if (product.stock < item.quantity) {
+                return NextResponse.json(
+                    {
+                        success: false,
+                        message: `Only ${product.stock} ${product.name} left in stock.`,
+                    },
+                    { status: 400 }
+                );
+            }
+
+            subtotal += product.offerPrice * item.quantity;
+        }
+
+        const totalAmount = subtotal + SHIPPING_FEE;
+
+        const orderNumber = `ELT-${Date.now().toString().slice(-8)}`;
 
         const order = await Order.create({
             userId: userId || null,
             isGuest: !userId,
+
+            orderNumber,
 
             customer,
             address,
@@ -49,38 +91,53 @@ export async function POST(req) {
             items,
 
             subtotal,
-            shipping: 250,
+            shipping: SHIPPING_FEE,
             totalAmount,
 
             paymentMethod,
             paymentStatus: "Pending",
             orderStatus: "Pending",
         });
-        if (userId) {
-            const user = await User.findOne({ _id: userId });
 
-            if (user) {
-                user.cartItems = {};
-                await user.save();
-            }
+        // Update stock & sold count
+        for (const item of items) {
+            await Product.findByIdAndUpdate(
+                item.product,
+                {
+                    $inc: {
+                        stock: -item.quantity,
+                        sold: item.quantity,
+                    },
+                }
+            );
         }
+
+        // Clear user's cart
+        if (userId) {
+            await User.findOneAndUpdate(
+                { _id: userId },
+                { cartItems: {} }
+            );
+        }
+
         await inngest.send({
             name: "order/created",
             data: {
                 orderId: order._id,
             },
         });
+
         return NextResponse.json(
             {
                 success: true,
                 message: "Order placed successfully",
-                order
-
+                order,
             },
             { status: 201 }
         );
+
     } catch (error) {
-        console.log(error);
+        console.error(error);
 
         return NextResponse.json(
             {

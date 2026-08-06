@@ -99,7 +99,7 @@ const CartClient = ({ products }) => {
                 >
                   <div className="w-28 h-28 rounded-xl bg-gray-100 flex items-center justify-center">
                     <Image
-                      src={product.image[0]}
+                      src={product.images[0]}
                       alt={product.name}
                       width={120}
                       height={120}

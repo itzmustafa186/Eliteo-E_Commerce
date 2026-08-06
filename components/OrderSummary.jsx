@@ -69,9 +69,6 @@ const OrderSummary = () => {
       }));
 
       const orderData = {
-        userId: user?.id || null,
-        isGuest: !user,
-
         customer: {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -89,14 +86,12 @@ const OrderSummary = () => {
           notes: formData.notes,
         },
 
-        items,
-
-        subtotal: getCartAmount(),
-        shipping: SHIPPING_FEE,
-        totalAmount: getCartAmount() + SHIPPING_FEE,
+        items: Object.keys(cartItems).map((productId) => ({
+          product: productId,
+          quantity: cartItems[productId],
+        })),
 
         paymentMethod: "Cash on Delivery",
-
       };
 
       const { data } = await axios.post("/api/order/create", orderData);

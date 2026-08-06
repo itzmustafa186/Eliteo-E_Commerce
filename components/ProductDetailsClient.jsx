@@ -7,8 +7,10 @@ import { useAppContext } from "@/context/AppContext";
 import ProductCard from "./ProductCard";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import ReviewSection from "./ReviewSection";
 
-const ProductDetailsClient = ({ productData, featuredProducts }) => {
+
+const ProductDetailsClient = ({ productData, featuredProducts, reviews }) => {
     const { router, addToCart } = useAppContext();
 
     const [mainImage, setMainImage] = useState(null);
@@ -16,8 +18,8 @@ const ProductDetailsClient = ({ productData, featuredProducts }) => {
         return <p>Product not found.</p>;
     }
     const currentImage = useMemo(
-        () => mainImage || productData.image[0],
-        [mainImage, productData.image]
+        () => mainImage || productData.images[0],
+        [mainImage, productData.images]
     );
 
 
@@ -32,7 +34,7 @@ const ProductDetailsClient = ({ productData, featuredProducts }) => {
 
     const thumbnails = useMemo(
         () =>
-            productData.image.map((image, index) => (
+            productData.images.map((image, index) => (
                 <div
                     key={index}
                     onClick={() => setMainImage(image)}
@@ -59,7 +61,7 @@ const ProductDetailsClient = ({ productData, featuredProducts }) => {
         router.prefetch("/cart");
     }, [router]);
     return (<>
-        {/* <Navbar /> */}
+        <Navbar />
         <div className="px-6 md:px-16 lg:px-32 pt-14 space-y-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
                 <div className="px-5 lg:px-16 xl:px-20">
@@ -86,26 +88,53 @@ const ProductDetailsClient = ({ productData, featuredProducts }) => {
                         {productData.name}
                     </h1>
                     <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-0.5">
-                            <Image className="h-4 w-4" src={assets.star_icon} alt="star_icon" />
-                            <Image className="h-4 w-4" src={assets.star_icon} alt="star_icon" />
-                            <Image className="h-4 w-4" src={assets.star_icon} alt="star_icon" />
-                            <Image className="h-4 w-4" src={assets.star_icon} alt="star_icon" />
-                            <Image
-                                className="h-4 w-4"
-                                src={assets.star_dull_icon}
-                                alt="star_dull_icon"
-                            />
-                        </div>
-                        <p>(4.5)</p>
+
+                        {
+                            productData.rating > 0 ? (
+                                <>
+                                    <div className="flex items-center gap-0.5">
+
+                                        {Array.from({ length: 5 }).map((_, index) => (
+                                            <Image
+                                                key={index}
+                                                className="h-4 w-4"
+                                                src={
+                                                    index < Math.round(productData.rating)
+                                                        ? assets.star_icon
+                                                        : assets.star_dull_icon
+                                                }
+                                                alt="star"
+                                            />
+                                        ))}
+
+                                    </div>
+
+                                    <p className="text-gray-600">
+                                        {productData.rating}
+                                    </p>
+
+                                    <span className="text-gray-400">
+                                        ({productData.reviewCount} Reviews)
+                                    </span>
+                                </>
+                            ) : (
+
+                                <p className="text-gray-400 text-sm">
+                                    No rating yet
+                                </p>
+
+                            )
+
+                        }
+
                     </div>
                     <p className="text-gray-600 mt-3">
                         {productData.description}
                     </p>
                     <p className="text-3xl font-medium mt-6">
-                        ${productData.offerPrice}
+                        Rs.{productData.offerPrice}
                         <span className="text-base font-normal text-gray-800/60 line-through ml-2">
-                            ${productData.price}
+                            Rs.{productData.price}
                         </span>
                     </p>
                     <hr className="bg-gray-600 my-6" />
@@ -140,6 +169,12 @@ const ProductDetailsClient = ({ productData, featuredProducts }) => {
                     </div>
                 </div>
             </div>
+            <ReviewSection
+                productId={productData._id}
+                rating={productData.rating}
+                reviewCount={productData.reviewCount}
+                reviews={reviews}
+            />
             <div className="flex flex-col items-center">
                 <div className="flex flex-col items-center mb-4 mt-16">
                     <p className="text-3xl font-medium">Featured <span className="font-medium text-orange-600">Products</span></p>
@@ -161,7 +196,7 @@ const ProductDetailsClient = ({ productData, featuredProducts }) => {
                 </button>
             </div>
         </div>
-        {/* <Footer /> */}
+        <Footer />
     </>
 
     )

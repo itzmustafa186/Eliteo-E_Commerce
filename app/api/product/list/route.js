@@ -1,24 +1,25 @@
 import connectDB from "@/config/db";
-import authSeller from "@/lib/authSeller";
 import Product from "@/models/product";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function GET(request) {
+export async function GET() {
     try {
-
         await connectDB();
-        const products = await Product.find({})
-            .sort({ date: -1 })
-            .lean();
 
-        return NextResponse.json({
-            success: true,
-            products
-        }, {
-            status: 200
-        })
+        const products = (await Product.find({})
+            .sort({ createdAt: -1 })
+            .lean()).map((product) => ({
+                ...product,
+                _id: product._id.toString(),
+            }));
 
+        return NextResponse.json(
+            {
+                success: true,
+                products,
+            },
+            { status: 200 }
+        );
     } catch (error) {
         console.error(error);
 
@@ -29,6 +30,5 @@ export async function GET(request) {
             },
             { status: 500 }
         );
-
     }
 }

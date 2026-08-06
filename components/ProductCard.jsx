@@ -16,14 +16,14 @@ const ProductCard = ({ product }) => {
 
     return (
         <Link
-            href={`/product/${product._id}`}
+            href={`/product/${product.slug}`}
             className="group relative w-full max-w-sm mx-auto overflow-hidden rounded-3xl bg-white border border-gray-200 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:border-orange-200"
         >
             {/* IMAGE */}
             <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50">
 
                 <Image
-                    src={product.image[0]}
+                    src={product.images[0]}
                     alt={product.name}
                     fill
                     priority={false}
@@ -65,6 +65,7 @@ const ProductCard = ({ product }) => {
                 </h3>
 
                 {/* Rating */}
+                {/* Rating */}
                 <div className="flex items-center justify-between">
 
                     <div className="flex items-center gap-1 rounded-full bg-orange-50 px-3 py-1">
@@ -77,13 +78,14 @@ const ProductCard = ({ product }) => {
                         />
 
                         <span className="text-sm font-medium text-orange-600">
-                            4.8
+                            {product.rating || 0}
                         </span>
 
                     </div>
 
+
                     <span className="text-xs text-gray-400">
-                        120+ Reviews
+                        {product.reviewCount || 0} Reviews
                     </span>
 
                 </div>

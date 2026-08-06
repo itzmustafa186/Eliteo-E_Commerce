@@ -5,6 +5,8 @@ import { auth } from "@clerk/nextjs/server";
 import { v2 as cloudinary } from "cloudinary";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import slugify from "slugify";
+import crypto from "crypto";
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -49,27 +51,28 @@ export async function POST(request) {
         const name = formData.get("name");
         const description = formData.get("description");
         const category = formData.get("category");
+        const subCategory = formData.get("subCategory") || "";
+        const brand = formData.get("brand") || "";
+
         const price = Number(formData.get("price"));
         const offerPrice = Number(formData.get("offerPrice"));
+        const stock = Number(formData.get("stock")) || 0;
 
         const files = formData.getAll("images");
 
         // Validation
-        if (!name || !description || !category) {
+        if (
+            !name ||
+            !description ||
+            !category ||
+            price <= 0 ||
+            offerPrice < 0 ||
+            stock < 0
+        ) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: "All fields are required",
-                },
-                { status: 400 }
-            );
-        }
-
-        if (files.length === 0 || !files[0].name) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    message: "Please upload at least one image",
+                    message: "Invalid product data.",
                 },
                 { status: 400 }
             );
@@ -79,14 +82,30 @@ export async function POST(request) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: "Offer price cannot be greater than price",
+                    message: "Offer price cannot be greater than price.",
                 },
                 { status: 400 }
             );
         }
-        console.time("Total");
 
-        console.time("Cloudinary Upload");
+        if (files.length === 0 || !files[0].name) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Please upload at least one image.",
+                },
+                { status: 400 }
+            );
+        }
+        const slug =
+            slugify(name, {
+                lower: true,
+                strict: true,
+            }) +
+            "-" +
+            crypto.randomBytes(3).toString("hex");
+
+        const sku = `ELT-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
 
         const uploadResults = await Promise.all(
             files.map(async (file) => {
@@ -122,22 +141,46 @@ export async function POST(request) {
                 });
             })
         );
+        const imageUrls = uploadResults.map((item) => item.secure_url);
 
+        if (imageUrls.length === 0) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Image upload failed.",
+                },
+                { status: 500 }
+            );
+        }
 
         const product = await Product.create({
-            userId,
+            sellerId: userId,
+
             name,
+            slug,
+
             description,
+
             category,
+            subCategory,
+            brand,
+
+            images: imageUrls,
+
             price,
             offerPrice,
-            image: uploadResults.map((item) => item.secure_url),
-            date: Date.now(),
+            stock,
+
+            sku,
+
+            featured: false,
+            isActive: true,
         });
 
         revalidatePath("/");
         revalidatePath("/all-products");
-        revalidatePath("/seller/products");
+        revalidatePath("/seller/product-list");
+        
 
         return NextResponse.json(
             {

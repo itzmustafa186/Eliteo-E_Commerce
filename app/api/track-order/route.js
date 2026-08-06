@@ -8,28 +8,43 @@ export async function POST(req) {
 
         await connectDB();
 
-        const { orderId, email } = await req.json();
+        const { orderNumber, email } = await req.json();
+
 
         const order = await Order.findOne({
-            _id: orderId,
+            orderNumber,
             "customer.email": email,
         })
             .populate("items.product")
             .lean();
 
-        if (!order) {
 
+        if (!order) {
             return NextResponse.json({
                 success: false,
                 message: "Order not found."
             });
-
         }
+
 
         return NextResponse.json({
             success: true,
-            order,
+            order: {
+                ...order,
+                _id: order._id.toString(),
+                items: order.items.map(item => ({
+                    ...item,
+                    _id: item._id.toString(),
+                    product: item.product
+                        ? {
+                            ...item.product,
+                            _id: item.product._id.toString(),
+                        }
+                        : null,
+                })),
+            },
         });
+
 
     } catch (error) {
 
