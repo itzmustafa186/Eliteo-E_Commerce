@@ -139,29 +139,43 @@ const ProductDetailsClient = ({ productData, featuredProducts, reviews }) => {
                     </p>
                     <hr className="bg-gray-600 my-6" />
                     <div className="overflow-x-auto">
-                        <table className="table-auto border-collapse w-full max-w-72">
-                            <tbody>
-                                <tr>
-                                    <td className="text-gray-600 font-medium">Brand</td>
-                                    <td className="text-gray-800/50 ">Generic</td>
-                                </tr>
-                                <tr>
-                                    <td className="text-gray-600 font-medium">Color</td>
-                                    <td className="text-gray-800/50 ">Multi</td>
-                                </tr>
-                                <tr>
-                                    <td className="text-gray-600 font-medium">Category</td>
-                                    <td className="text-gray-800/50">
-                                        {productData.category}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
+                            <table className="w-full text-sm">
+                                <tbody>
+
+                                    <tr className="border-b border-gray-200">
+                                        <td className="w-32 bg-gray-50 px-5 py-4 font-semibold text-gray-700">
+                                            Brand
+                                        </td>
+                                        <td className="px-5 py-4 text-gray-900">
+                                            {productData.brand || "N/A"}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td className="bg-gray-50 px-5 py-4 font-semibold text-gray-700">
+                                            Category
+                                        </td>
+                                        <td className="px-5 py-4 text-gray-900">
+                                            {productData.category}
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div className="flex items-center mt-10 gap-4">
-                        <button onClick={handleAddToCart} className="w-full py-3.5 bg-gray-100 text-gray-800/80 hover:bg-gray-200 transition">
-                            Add to Cart
+                        <button
+                            disabled={productData.stock === 0}
+                            onClick={handleAddToCart}
+                            className={`w-full py-3.5 ${productData.stock === 0
+                                ? "bg-gray-300 cursor-not-allowed"
+                                : "bg-orange-500 hover:bg-orange-600 text-white"
+                                }`}
+                        >
+                            {productData.stock === 0 ? "Out of Stock" : "Add to Cart"}
                         </button>
                         <button onClick={handleBuyNow} className="w-full py-3.5 bg-orange-500 text-white hover:bg-orange-600 transition">
                             Buy now

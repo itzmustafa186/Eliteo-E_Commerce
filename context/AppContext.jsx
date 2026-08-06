@@ -60,17 +60,27 @@ export const AppContextProvider = (props) => {
     };
 
     const addToCart = async (itemId) => {
-        const cartData = structuredClone(cartItems || {});
+        const product = products.find((p) => p._id === itemId);
 
-        if (cartData[itemId]) {
-            cartData[itemId] += 1;
-        } else {
-            cartData[itemId] = 1;
+        if (!product) {
+            return toast.error("Product not found");
         }
+
+        const currentQty = cartItems[itemId] || 0;
+
+        if (product.stock <= 0) {
+            return toast.error("This product is out of stock");
+        }
+
+        if (currentQty >= product.stock) {
+            return toast.error(`Only ${product.stock} item(s) available`);
+        }
+
+        const cartData = structuredClone(cartItems || {});
+        cartData[itemId] = currentQty + 1;
 
         setCartItems(cartData);
 
-        // Save guest cart
         if (!user) {
             localStorage.setItem("guestCart", JSON.stringify(cartData));
             toast.success("Item added to cart");
@@ -79,6 +89,7 @@ export const AppContextProvider = (props) => {
 
         try {
             const token = await getToken();
+
             await axios.post(
                 "/api/cart/update",
                 { cartData },
@@ -88,15 +99,24 @@ export const AppContextProvider = (props) => {
                     },
                 }
             );
+
             toast.success("Item added");
         } catch (error) {
-            toast.error(error.message);
+            toast.error(error.response?.data?.message || error.message);
         }
     };
     const updateCartQuantity = async (itemId, quantity) => {
+        const product = products.find((p) => p._id === itemId);
+
+        if (!product) return;
+
+        if (quantity > product.stock) {
+            return toast.error(`Only ${product.stock} item(s) available`);
+        }
+
         const cartData = structuredClone(cartItems || {});
 
-        if (quantity === 0) {
+        if (quantity <= 0) {
             delete cartData[itemId];
         } else {
             cartData[itemId] = quantity;
@@ -104,7 +124,6 @@ export const AppContextProvider = (props) => {
 
         setCartItems(cartData);
 
-        // Save guest cart
         if (!user) {
             localStorage.setItem("guestCart", JSON.stringify(cartData));
             return;
@@ -112,6 +131,7 @@ export const AppContextProvider = (props) => {
 
         try {
             const token = await getToken();
+
             await axios.post(
                 "/api/cart/update",
                 { cartData },
@@ -122,10 +142,9 @@ export const AppContextProvider = (props) => {
                 }
             );
         } catch (error) {
-            toast.error(error.message);
+            toast.error(error.response?.data?.message || error.message);
         }
     };
-
     const getCartCount = () => {
         let totalCount = 0;
         for (const items in cartItems) {
@@ -172,7 +191,7 @@ export const AppContextProvider = (props) => {
 
     useEffect(() => {
         fetchProductData()
-    })
+    }, [])
     const value = {
         user,
         getToken,

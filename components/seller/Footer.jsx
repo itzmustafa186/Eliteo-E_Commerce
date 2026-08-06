@@ -1,30 +1,39 @@
-import React from "react";
-import { assets } from "@/assets/assets";
-import Image from "next/image";
+import React from 'react'
 
-const Footer = () => {
+const SellerFooter = () => {
   return (
-    <div className="flex md:flex-row flex-col-reverse items-center justify-between text-left w-full px-10">
-      <div className="flex items-center gap-4">
-        <Image className="hidden md:block" src="/icon.png" width={120} height={60} alt="logo" />
-        <div className="hidden md:block h-7 w-px bg-gray-500/60"></div>
-        <p className="py-4 text-center text-xs md:text-sm text-gray-500">
-          Copyright 2026 © eliteo All Right Reserved.
+    <footer className="mt-auto border-t bg-white px-6 py-5">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h3 className="font-bold text-gray-900">
+            Eliteo Seller Dashboard
+          </h3>
+
+          <p className="text-sm text-gray-500">
+            Manage your store efficiently.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-6 text-sm text-gray-500">
+          <button className="hover:text-orange-600">
+            Privacy
+          </button>
+
+          <button className="hover:text-orange-600">
+            Terms
+          </button>
+
+          <button className="hover:text-orange-600">
+            Support
+          </button>
+        </div>
+
+        <p className="text-sm text-gray-400">
+          © 2026 Eliteo
         </p>
       </div>
-      <div className="flex items-center gap-3">
-        <a href="#">
-          <Image src={assets.facebook_icon} alt="facebook_icon" />
-        </a>
-        <a href="#">
-          <Image src={assets.twitter_icon} alt="twitter_icon" />
-        </a>
-        <a href="#">
-          <Image src={assets.instagram_icon} alt="instagram_icon" />
-        </a>
-      </div>
-    </div>
-  );
-};
+    </footer>
+  )
+}
 
-export default Footer;
+export default SellerFooter

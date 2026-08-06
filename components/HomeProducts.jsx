@@ -4,6 +4,11 @@ import React from "react";
 import ProductCard from "./ProductCard";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Autoplay } from "swiper/modules";
+
+import "swiper/css";
+import "swiper/css/navigation";
 
 const HomeProducts = ({ products }) => {
   const router = useRouter();
@@ -42,15 +47,44 @@ const HomeProducts = ({ products }) => {
 
       </div>
 
-      {/* Products */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
+      <Swiper
+        modules={[Autoplay]}
+        autoplay={{
+          delay: 3500,
+          disableOnInteraction: false,
+        }}
+        loop
+        grabCursor
+        spaceBetween={20}
+        breakpoints={{
+          320: {
+            slidesPerView: 1.2,
+            spaceBetween: 12,
+          },
+          640: {
+            slidesPerView: 2,
+            spaceBetween: 16,
+          },
+          768: {
+            slidesPerView: 2.5,
+            spaceBetween: 18,
+          },
+          1024: {
+            slidesPerView: 3,
+            spaceBetween: 20,
+          },
+          1280: {
+            slidesPerView: 3.5,
+            spaceBetween: 20,
+          },
+        }}
+      >
         {products.map((product) => (
-          <ProductCard
-            key={product._id.toString()}
-            product={product}
-          />
+          <SwiperSlide key={product._id}>
+            <ProductCard product={product} />
+          </SwiperSlide>
         ))}
-      </div>
+      </Swiper>
 
       {/* Bottom Button */}
       <div className="mt-14 flex justify-center">

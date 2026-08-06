@@ -9,6 +9,7 @@ import React, { memo } from "react";
 
 const ProductCard = ({ product }) => {
     const { currency } = useAppContext();
+    const isOutOfStock = product.stock <= 0;
 
     const discount = Math.round(
         ((product.price - product.offerPrice) / product.price) * 100
@@ -17,42 +18,51 @@ const ProductCard = ({ product }) => {
     return (
         <Link
             href={`/product/${product.slug}`}
-            className="group relative w-full max-w-sm mx-auto overflow-hidden rounded-3xl bg-white border border-gray-200 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:border-orange-200"
+            className={`group relative w-full overflow-hidden rounded-2xl border bg-white transition-all duration-300 ${isOutOfStock
+                ? "border-gray-200"
+                : "border-gray-200 hover:-translate-y-1 hover:border-orange-300 hover:shadow-xl"
+                }`}
         >
-            {/* IMAGE */}
-            <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50">
 
+            {/* IMAGE */}
+            <div
+                className={`relative flex aspect-square items-center justify-center bg-gradient-to-br from-gray-50 via-white to-orange-50 p-5 ${isOutOfStock ? "opacity-70" : ""
+                    }`}
+            >
                 <Image
                     src={product.images[0]}
                     alt={product.name}
-                    fill
-                    priority={false}
-                    sizes="(max-width:768px) 50vw,(max-width:1200px) 33vw,20vw"
-                    className="object-contain p-5 sm:p-7 transition duration-700 group-hover:scale-110 group-hover:rotate-2"
+                    width={220}
+                    height={220}
+                    className={`max-h-full max-w-full object-contain transition duration-500 ${!isOutOfStock && "group-hover:scale-105"
+                        }`}
                 />
 
-                {/* Discount */}
-                {discount > 0 && (
-                    <div className="absolute left-4 top-4 rounded-full bg-red-500 px-3 py-1 text-xs font-bold text-white shadow-lg">
+                {/* Save Badge */}
+                {!isOutOfStock && discount > 0 && (
+                    <span className="absolute top-4 left-4 rounded-full bg-red-500 px-3 py-1 text-xs font-bold text-white shadow-md">
                         SAVE {discount}%
-                    </div>
+                    </span>
                 )}
 
-                {/* Wishlist */}
-                <button className="absolute right-3 top-3 sm:right-4 sm:top-4 flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur transition hover:scale-110 hover:bg-orange-500 hover:text-white">
-                    <Heart size={18} />
-                </button>
+                {/* Out of Stock Badge */}
+                {isOutOfStock && (
+                    <span className="absolute bottom-4 left-4 rounded-full bg-gray-900 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-white shadow-lg">
+                        Out of Stock
+                    </span>
+                )}
 
-                {/* Quick View */}
-                <div className="hidden md:block absolute bottom-5 left-1/2 w-[85%] -translate-x-1/2 translate-y-20 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-                    <div className="rounded-full bg-orange-600 py-3 text-center font-semibold text-white shadow-xl">
-                        View Product
-                    </div>
-                </div>
+                
             </div>
 
+         
+
+            {/* Quick View */}
+
+
+
             {/* DETAILS */}
-            <div className="space-y-3 p-5">
+            <div className="space-y-2 p-4">
 
                 {/* Category */}
                 <span className="text-xs uppercase tracking-widest text-orange-500 font-semibold">
@@ -60,7 +70,7 @@ const ProductCard = ({ product }) => {
                 </span>
 
                 {/* Name */}
-                <h3 className="line-clamp-2 min-h-[48px] text-base sm:text-lg font-semibold text-gray-900 transition group-hover:text-orange-600">
+                <h3 className="line-clamp-2 h-11 text-sm lg:text-base font-semibold text-gray-900 group-hover:text-orange-600">
                     {product.name}
                 </h3>
 
@@ -91,33 +101,39 @@ const ProductCard = ({ product }) => {
                 </div>
 
                 {/* PRICE */}
-                <div className="flex items-end justify-between pt-2">
+                <div className="pt-1">
 
-                    <div>
+                    <h2 className="text-xl font-bold text-orange-600">
+                        {currency}{product.offerPrice.toLocaleString()}
+                    </h2>
 
-                        <h2 className="text-2xl font-bold text-gray-900">
-                            {currency}
-                            {product.offerPrice}
-                        </h2>
+                    <div className="mt-1 flex items-center gap-2">
+                        <span className="text-sm text-gray-400 line-through">
+                            {currency}{product.price.toLocaleString()}
+                        </span>
 
-                        <p className="text-sm text-gray-400 line-through">
-                            {currency}
-                            {product.price}
-                        </p>
 
-                    </div>
-
-                    <div className="rounded-full bg-orange-100 px-4 py-2 text-sm font-semibold text-orange-600 transition group-hover:bg-orange-600 group-hover:text-white">
-                        Buy
                     </div>
 
                 </div>
 
+                {/* Buy Button */}
+                <button
+                    disabled={isOutOfStock}
+                    className={`mt-3 w-full rounded-xl py-2.5 text-sm font-semibold transition ${isOutOfStock
+                            ? "cursor-not-allowed bg-gray-300 text-gray-600"
+                            : "bg-orange-600 text-white hover:bg-orange-700"
+                        }`}
+                >
+                    {isOutOfStock ? "Out of Stock" : "Buy Now"}
+                </button>
+
             </div>
+
 
             {/* Glow */}
             <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-orange-500/0 transition group-hover:ring-orange-500/20"></div>
-        </Link>
+        </Link >
     );
 };
 

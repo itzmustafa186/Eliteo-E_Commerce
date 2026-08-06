@@ -16,7 +16,7 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true)
 
   const fetchSellerProduct = async () => {
- 
+
     try {
       const token = await getToken();
 
@@ -33,6 +33,31 @@ const ProductList = () => {
     }
   }
 
+  const toggleProduct = async (id) => {
+    try {
+      const token = await getToken();
+
+      const { data } = await axios.patch(
+        `/api/product/active/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        await fetchSellerProduct();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchSellerProduct();
@@ -40,57 +65,683 @@ const ProductList = () => {
   }, [user])
 
   return (
-    <div className="flex-1 min-h-screen flex flex-col justify-between">
-      {loading ? <Loading /> : <div className="w-full md:p-10 p-4">
-        <h2 className="pb-4 text-lg font-medium">All Product</h2>
-        <div className="flex flex-col items-center max-w-4xl w-full overflow-hidden rounded-md bg-white border border-gray-500/20">
-          <table className=" table-fixed w-full overflow-hidden">
-            <thead className="text-gray-900 text-sm text-left">
-              <tr>
-                <th className="w-2/3 md:w-2/5 px-4 py-3 font-medium truncate">Product</th>
-                <th className="px-4 py-3 font-medium truncate max-sm:hidden">Category</th>
-                <th className="px-4 py-3 font-medium truncate">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50 p-4 md:p-8">
+
+
+      <div className="max-w-7xl mx-auto space-y-8">
+
+
+
+        {/* Header */}
+
+        <div className="
+bg-white/80
+backdrop-blur-xl
+border
+border-gray-200
+rounded-3xl
+p-6
+shadow-lg
+">
+
+          <h1 className="
+text-3xl
+md:text-4xl
+font-bold
+text-gray-900
+">
+            Products
+          </h1>
+
+          <p className="text-gray-500 mt-2">
+            Manage your products, inventory and store visibility.
+          </p>
+
+
+        </div>
+
+
+
+
+
+
+
+        {/* MOBILE */}
+
+        <div className="grid gap-5 md:hidden">
+
+
+          {
+            products.map(product => (
+
+
+              <div
+                key={product._id}
+                className="
+bg-white
+rounded-3xl
+border
+border-gray-200
+p-5
+shadow-md
+hover:shadow-xl
+transition
+"
+              >
+
+
+                <div className="flex gap-4">
+
+
+                  <div className="
+h-24
+w-24
+rounded-2xl
+bg-gray-50
+border
+flex
+items-center
+justify-center
+">
+
+                    <Image
+
+                      src={product.images[0]}
+
+                      alt={product.name}
+
+                      width={80}
+
+                      height={80}
+
+                      className="object-contain"
+
+                    />
+
+
+                  </div>
+
+
+
+
+
+                  <div className="flex-1">
+
+
+                    <h2 className="
+font-semibold
+text-gray-900
+line-clamp-2
+">
+
+                      {product.name}
+
+                    </h2>
+
+
+
+                    <p className="
+text-sm
+text-gray-500
+mt-1
+">
+
+                      {product.category}
+
+                    </p>
+
+
+
+
+
+                    <div className="mt-2">
+
+
+                      <span className="
+text-xl
+font-bold
+text-orange-600
+">
+
+                        Rs. {product.offerPrice.toLocaleString()}
+
+                      </span>
+
+
+                      <p className="
+text-xs
+text-gray-400
+line-through
+">
+
+                        Rs. {product.price.toLocaleString()}
+
+                      </p>
+
+
+                    </div>
+
+
+
+                  </div>
+
+
+                </div>
+
+
+
+
+
+
+
+                <div className="
+flex
+gap-2
+mt-5
+flex-wrap
+">
+
+
+                  <span className={`status-pill ${product.stock > 0
+                    ?
+                    "bg-green-100 text-green-700"
+                    :
+                    "bg-red-100 text-red-700"
+                    }`}>
+
+                    {
+                      product.stock > 0
+                        ?
+                        `${product.stock} Stock`
+                        :
+                        "Out"
+                    }
+
+                  </span>
+
+
+
+
+                  <span className={`status-pill ${product.isActive
+                    ?
+                    "bg-green-100 text-green-700"
+                    :
+                    "bg-gray-200 text-gray-700"
+                    }`}>
+
+                    {
+                      product.isActive
+                        ?
+                        "Active"
+                        :
+                        "Inactive"
+                    }
+
+                  </span>
+
+
+
+                </div>
+
+
+
+
+
+
+
+
+                <div className="
+grid
+grid-cols-3
+gap-2
+mt-5
+">
+
+
+                  <button
+
+                    onClick={() => router.push(`/seller/edit-product/${product._id}`)}
+
+                    className="
+rounded-xl
+bg-blue-600
+py-2.5
+text-sm
+font-semibold
+text-white
+hover:bg-blue-700
+transition
+">
+
+                    Edit
+
+                  </button>
+
+
+
+
+
+                  <button
+
+                    onClick={() => toggleProduct(product._id)}
+
+                    className={`rounded-xl py-2.5 text-sm font-semibold text-white transition ${product.isActive
+                      ?
+                      "bg-red-600 hover:bg-red-700"
+                      :
+                      "bg-green-600 hover:bg-green-700"
+                      }`}
+
+                  >
+
+                    {
+                      product.isActive
+                        ?
+                        "Disable"
+                        :
+                        "Enable"
+                    }
+
+                  </button>
+
+
+
+
+
+
+                  <button
+
+                    onClick={() => router.push(`/product/${product.slug}`)}
+
+                    className="
+rounded-xl
+bg-gray-900
+py-2.5
+text-sm
+font-semibold
+text-white
+hover:bg-black
+transition
+">
+
+                    View
+
+                  </button>
+
+
+
+                </div>
+
+
+
+              </div>
+
+
+            ))
+
+          }
+
+
+        </div>
+
+
+
+
+
+
+
+
+
+        {/* DESKTOP TABLE */}
+
+
+        <div className="
+hidden
+md:block
+overflow-hidden
+rounded-3xl
+border
+border-gray-200
+bg-white/90
+shadow-xl
+">
+
+
+          <table className="w-full">
+
+
+            <thead>
+
+              <tr className="
+bg-gray-50
+text-gray-700
+text-sm
+">
+
+                <th className="px-6 py-5 text-left">
+                  Product
+                </th>
+
+                <th className="px-6 py-5">
+                  Category
+                </th>
+
+
+                <th className="px-6 py-5">
+                  Stock
+                </th>
+
+
+                <th className="px-6 py-5">
                   Price
                 </th>
-                <th className="px-4 py-3 font-medium truncate max-sm:hidden">Action</th>
+
+
+                <th className="px-6 py-5">
+                  Status
+                </th>
+
+
+                <th className="px-6 py-5">
+                  Actions
+                </th>
+
+
               </tr>
+
+
             </thead>
-            <tbody className="text-sm text-gray-500">
-              {products.map((product, index) => (
-                <tr key={index} className="border-t border-gray-500/20">
-                  <td className="md:px-4 pl-2 md:pl-4 py-3 flex items-center space-x-3 truncate">
-                    <div className="bg-gray-500/10 rounded p-2">
-                      <Image
-                        src={product.image[0]}
-                        alt="product Image"
-                        className="w-16"
-                        width={1280}
-                        height={720}
-                      />
-                    </div>
-                    <span className="truncate w-full">
-                      {product.name}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 max-sm:hidden">{product.category}</td>
-                  <td className="px-4 py-3">${product.offerPrice}</td>
-                  <td className="px-4 py-3 max-sm:hidden">
-                    <button onClick={() => router.push(`/product/${product._id}`)} className="flex items-center gap-1 px-1.5 md:px-3.5 py-2 bg-orange-600 text-white rounded-md">
-                      <span className="hidden md:block">Visit</span>
-                      <Image
-                        className="h-3.5"
-                        src={assets.redirect_icon}
-                        alt="redirect_icon"
-                      />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+
+
+
+
+
+
+
+            <tbody>
+
+
+              {
+                products.map(product => (
+
+
+                  <tr
+                    key={product._id}
+                    className="
+border-t
+hover:bg-orange-50
+transition
+"
+                  >
+
+
+                    <td className="px-6 py-5">
+
+
+                      <div className="
+flex
+items-center
+gap-4
+">
+
+
+                        <div className="
+h-16
+w-16
+rounded-2xl
+bg-gray-50
+border
+flex
+items-center
+justify-center
+">
+
+
+                          <Image
+
+                            src={product.images[0]}
+
+                            alt={product.name}
+
+                            width={60}
+
+                            height={60}
+
+                            className="object-contain"
+
+                          />
+
+
+                        </div>
+
+
+
+                        <div>
+
+                          <p className="
+font-semibold
+text-gray-900
+">
+
+                            {product.name}
+
+                          </p>
+
+
+                          <p className="
+text-xs
+text-gray-500
+">
+
+                            {product.sku}
+
+                          </p>
+
+
+                        </div>
+
+
+                      </div>
+
+
+                    </td>
+
+
+
+
+
+
+                    <td className="px-6 text-center">
+
+                      {product.category}
+
+                    </td>
+
+
+
+
+
+
+                    <td className="px-6 text-center">
+
+
+                      <span className={`status-pill ${product.stock > 0
+                        ?
+                        "bg-green-100 text-green-700"
+                        :
+                        "bg-red-100 text-red-700"
+                        }`}>
+
+                        {
+                          product.stock > 0
+                            ?
+                            product.stock
+                            :
+                            "Out"
+                        }
+
+                      </span>
+
+
+                    </td>
+
+
+
+
+
+
+                    <td className="px-6 text-center">
+
+
+                      <p className="
+font-bold
+text-orange-600
+">
+
+                        Rs. {product.offerPrice.toLocaleString()}
+
+                      </p>
+
+
+                      <p className="
+text-xs
+text-gray-400
+line-through
+">
+
+                        Rs. {product.price.toLocaleString()}
+
+                      </p>
+
+
+                    </td>
+
+
+
+
+
+
+
+
+                    <td className="px-6 text-center">
+
+
+                      <span className={`status-pill ${product.isActive
+                        ?
+                        "bg-green-100 text-green-700"
+                        :
+                        "bg-gray-200 text-gray-700"
+                        }`}>
+
+                        {
+                          product.isActive
+                            ?
+                            "Active"
+                            :
+                            "Inactive"
+                        }
+
+                      </span>
+
+
+                    </td>
+
+
+
+
+
+
+
+                    <td className="px-6">
+
+
+                      <div className="
+flex
+justify-center
+gap-2
+">
+
+
+                        <button
+
+                          onClick={() => router.push(`/seller/edit-product/${product._id}`)}
+
+                          className="
+action-blue
+">
+
+                          Edit
+
+                        </button>
+
+
+
+
+                        <button
+
+                          onClick={() => toggleProduct(product._id)}
+
+                          className={`action-btn ${product.isActive
+                            ?
+                            "bg-red-600"
+                            :
+                            "bg-green-600"
+                            }`}>
+
+                          {
+                            product.isActive
+                              ?
+                              "Disable"
+                              :
+                              "Enable"
+                          }
+
+                        </button>
+
+
+
+
+
+                        <button
+
+                          onClick={() => router.push(`/product/${product.slug}`)}
+
+                          className="action-dark">
+
+                          View
+
+                        </button>
+
+
+                      </div>
+
+
+                    </td>
+
+
+
+                  </tr>
+
+
+                ))
+
+              }
+
+
             </tbody>
+
+
           </table>
+
+
         </div>
-      </div>}
-      <Footer />
+
+
+
+
+      </div>
+
+
     </div>
   );
 };

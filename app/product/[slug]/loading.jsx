@@ -1,9 +1,9 @@
-import Navbar from "@/components/Navbar";
+
 
 export default function Loading() {
   return (
     <>
-      <Navbar />
+     
 
       <div className="min-h-[80vh] flex items-center justify-center">
         <div className="flex flex-col items-center">

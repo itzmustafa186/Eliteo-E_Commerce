@@ -25,10 +25,12 @@
     "react-dom": "19.2.4",
     "react-hot-toast": "^2.6.0",
     "resend": "^6.18.1",
-    "slugify": "^1.6.9"
+    "slugify": "^1.6.9",
+    "swiper": "^14.0.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/react": "19.2.18",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
