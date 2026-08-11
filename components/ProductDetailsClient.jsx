@@ -166,20 +166,28 @@ const ProductDetailsClient = ({ productData, featuredProducts, reviews }) => {
                         </div>
                     </div>
 
-                    <div className="flex items-center mt-10 gap-4">
-                        <button
-                            disabled={productData.stock === 0}
-                            onClick={handleAddToCart}
-                            className={`w-full py-3.5 ${productData.stock === 0
-                                ? "bg-gray-300 cursor-not-allowed"
-                                : "bg-orange-500 hover:bg-orange-600 text-white"
-                                }`}
-                        >
-                            {productData.stock === 0 ? "Out of Stock" : "Add to Cart"}
-                        </button>
-                        <button onClick={handleBuyNow} className="w-full py-3.5 bg-orange-500 text-white hover:bg-orange-600 transition">
-                            Buy now
-                        </button>
+                    <div className="mt-10 w-full">
+                        {Number(productData.stock) <= 0 ? (
+                            <div className="flex h-14 w-full items-center justify-center rounded-xl bg-gray-100 text-sm font-bold uppercase tracking-wider text-gray-500">
+                                Sold Out
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={handleAddToCart}
+                                    className="w-full rounded-xl bg-orange-500 py-3.5 font-semibold text-white transition hover:bg-orange-600"
+                                >
+                                    Add to Cart
+                                </button>
+
+                                <button
+                                    onClick={handleBuyNow}
+                                    className="w-full rounded-xl bg-orange-500 py-3.5 font-semibold text-white transition hover:bg-orange-600"
+                                >
+                                    Buy Now
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

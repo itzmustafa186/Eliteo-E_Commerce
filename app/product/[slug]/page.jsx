@@ -18,7 +18,7 @@ export default async function ProductPage({ params }) {
     const productData = await Product.findOne({
         slug: slug
     })
-        .select("name description images offerPrice price category brand slug rating reviewCount")
+        .select("name description images offerPrice price category brand slug rating reviewCount stock ")
         .lean();
 
 
