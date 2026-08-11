@@ -11,6 +11,7 @@ import {
   Star,
   Menu,
   X,
+  Box,
 } from "lucide-react";
 
 const menuItems = [
@@ -38,6 +39,11 @@ const menuItems = [
     name: "Reviews",
     href: "/seller/reviews",
     icon: Star,
+  },
+  {
+    name: "Reviews",
+    href: "/seller/carousel",
+    icon: Box,
   },
 ];
 
