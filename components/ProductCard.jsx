@@ -4,136 +4,168 @@ import Link from "next/link";
 import Image from "next/image";
 import { assets } from "@/assets/assets";
 import { useAppContext } from "@/context/AppContext";
-import { Heart } from "lucide-react";
 import React, { memo } from "react";
 
 const ProductCard = ({ product }) => {
     const { currency } = useAppContext();
+
     const isOutOfStock = product.stock <= 0;
 
-    const discount = Math.round(
-        ((product.price - product.offerPrice) / product.price) * 100
-    );
+    const discount =
+        product.price > 0
+            ? Math.round(
+                  ((product.price - product.offerPrice) /
+                      product.price) *
+                      100
+              )
+            : 0;
 
     return (
-        <Link
-            href={`/product/${product.slug}`}
-            className={`group relative w-full overflow-hidden rounded-2xl border bg-white transition-all duration-300 ${isOutOfStock
-                ? "border-gray-200"
-                : "border-gray-200 hover:-translate-y-1 hover:border-orange-300 hover:shadow-xl"
-                }`}
+        <div
+            className={`group relative w-full overflow-hidden rounded-2xl border bg-white transition-all duration-300 ${
+                isOutOfStock
+                    ? "border-gray-200"
+                    : "border-gray-200 hover:-translate-y-1 hover:border-orange-200 hover:shadow-xl"
+            }`}
         >
+            {/* ================= IMAGE ================= */}
 
-            {/* IMAGE */}
-            <div
-                className={`relative flex aspect-square items-center justify-center bg-gradient-to-br from-gray-50 via-white to-orange-50 p-5 ${isOutOfStock ? "opacity-70" : ""
+            <Link href={`/product/${product.slug}`}>
+                <div
+                    className={`relative flex w-full items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50
+                    aspect-square
+                    sm:aspect-[4/3]
+                    lg:aspect-square
+                    xl:aspect-[4/3]
+                    ${
+                        isOutOfStock ? "opacity-70" : ""
                     }`}
-            >
-                <Image
-                    src={product.images[0]}
-                    alt={product.name}
-                    width={220}
-                    height={220}
-                    className={`max-h-full max-w-full object-contain transition duration-500 ${!isOutOfStock && "group-hover:scale-105"
-                        }`}
-                />
+                >
+                    {/* Product Image */}
 
-                {/* Save Badge */}
-                {!isOutOfStock && discount > 0 && (
-                    <span className="absolute top-4 left-4 rounded-full bg-red-500 px-3 py-1 text-xs font-bold text-white shadow-md">
-                        SAVE {discount}%
-                    </span>
-                )}
+                    <div className="relative flex h-[82%] w-[82%] items-center justify-center">
+                        <Image
+                            src={product.images?.[0]}
+                            alt={product.name}
+                            fill
+                            sizes="
+                                (max-width: 640px) 50vw,
+                                (max-width: 768px) 33vw,
+                                (max-width: 1024px) 25vw,
+                                (max-width: 1280px) 20vw,
+                                18vw
+                            "
+                            className={`object-contain transition-transform duration-500 ${
+                                !isOutOfStock
+                                    ? "group-hover:scale-110"
+                                    : ""
+                            }`}
+                        />
+                    </div>
 
-                {/* Out of Stock Badge */}
-                {isOutOfStock && (
-                    <span className="absolute bottom-4 left-4 rounded-full bg-gray-900 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-white shadow-lg">
-                        Out of Stock
-                    </span>
-                )}
+                    {/* Discount */}
 
-                
-            </div>
+                    {!isOutOfStock && discount > 0 && (
+                        <span className="absolute left-3 top-3 rounded-full bg-red-500 px-3 py-1.5 text-[10px] font-bold tracking-wide text-white shadow-md sm:left-4 sm:top-4 sm:text-xs">
+                            SAVE {discount}%
+                        </span>
+                    )}
 
-         
+                    {/* Out of Stock */}
 
-            {/* Quick View */}
+                    {isOutOfStock && (
+                        <span className="absolute bottom-3 left-3 rounded-full bg-gray-900 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-lg sm:bottom-4 sm:left-4 sm:px-4 sm:text-xs">
+                            Out of Stock
+                        </span>
+                    )}
+                </div>
+            </Link>
 
+            {/* ================= DETAILS ================= */}
 
-
-            {/* DETAILS */}
-            <div className="space-y-2 p-4">
+            <div className="p-3.5 sm:p-4 lg:p-5">
 
                 {/* Category */}
-                <span className="text-xs uppercase tracking-widest text-orange-500 font-semibold">
-                    {product.category}
-                </span>
 
-                {/* Name */}
-                <h3 className="line-clamp-2 h-11 text-sm lg:text-base font-semibold text-gray-900 group-hover:text-orange-600">
-                    {product.name}
-                </h3>
+                <Link href={`/product/${product.slug}`}>
+                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-orange-500 sm:text-xs">
+                        {product.category}
+                    </p>
+                </Link>
+
+                {/* Product Name */}
+
+                <Link href={`/product/${product.slug}`}>
+                    <h3 className="line-clamp-2 min-h-[40px] text-sm font-semibold leading-5 text-gray-900 transition-colors group-hover:text-orange-600 sm:text-base">
+                        {product.name}
+                    </h3>
+                </Link>
 
                 {/* Rating */}
-                {/* Rating */}
-                <div className="flex items-center justify-between">
 
-                    <div className="flex items-center gap-1 rounded-full bg-orange-50 px-3 py-1">
+                <div className="mt-3 flex items-center justify-between gap-2">
 
+                    <div className="flex items-center gap-1.5 rounded-full bg-orange-50 px-2.5 py-1">
                         <Image
                             src={assets.star_icon}
-                            alt="star"
-                            width={15}
-                            height={15}
+                            alt="Rating"
+                            width={14}
+                            height={14}
                         />
 
-                        <span className="text-sm font-medium text-orange-600">
+                        <span className="text-xs font-semibold text-orange-600 sm:text-sm">
                             {product.rating || 0}
                         </span>
-
                     </div>
 
-
-                    <span className="text-xs text-gray-400">
+                    <span className="truncate text-[10px] text-gray-400 sm:text-xs">
                         {product.reviewCount || 0} Reviews
                     </span>
-
                 </div>
 
-                {/* PRICE */}
-                <div className="pt-1">
+                {/* ================= PRICE ================= */}
 
-                    <h2 className="text-xl font-bold text-orange-600">
-                        {currency}{product.offerPrice.toLocaleString()}
-                    </h2>
+                <div className="mt-3">
 
-                    <div className="mt-1 flex items-center gap-2">
-                        <span className="text-sm text-gray-400 line-through">
-                            {currency}{product.price.toLocaleString()}
+                    <div className="flex flex-wrap items-baseline gap-2">
+                        <span className="text-lg font-bold text-orange-600 sm:text-xl lg:text-2xl">
+                            {currency}
+                            {product.offerPrice?.toLocaleString()}
                         </span>
 
-
+                        {product.price > product.offerPrice && (
+                            <span className="text-xs text-gray-400 line-through sm:text-sm">
+                                {currency}
+                                {product.price?.toLocaleString()}
+                            </span>
+                        )}
                     </div>
-
                 </div>
 
-                {/* Buy Button */}
+                {/* ================= BUY BUTTON ================= */}
+
                 <button
+                    type="button"
                     disabled={isOutOfStock}
-                    className={`mt-3 w-full rounded-xl py-2.5 text-sm font-semibold transition ${isOutOfStock
-                            ? "cursor-not-allowed bg-gray-300 text-gray-600"
-                            : "bg-orange-600 text-white hover:bg-orange-700"
-                        }`}
+                    onClick={() => {
+                        if (!isOutOfStock) {
+                            window.location.href = `/product/${product.slug}`;
+                        }
+                    }}
+                    className={`mt-4 w-full rounded-xl py-2.5 text-xs font-semibold transition-all duration-300 sm:py-3 sm:text-sm ${
+                        isOutOfStock
+                            ? "cursor-not-allowed bg-gray-200 text-gray-500"
+                            : "bg-orange-600 text-white shadow-sm hover:bg-orange-700 hover:shadow-md"
+                    }`}
                 >
                     {isOutOfStock ? "Out of Stock" : "Buy Now"}
                 </button>
-
             </div>
 
+            {/* Premium Hover Ring */}
 
-            {/* Glow */}
-            <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-orange-500/0 transition group-hover:ring-orange-500/20"></div>
-        </Link >
+            <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-orange-500/0 transition-all duration-300 group-hover:ring-orange-500/20" />
+        </div>
     );
 };
 

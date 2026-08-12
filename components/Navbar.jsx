@@ -25,8 +25,23 @@ const Navbar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
   return (
-   <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/80 shadow-sm backdrop-blur-xl">
-  <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/80 shadow-sm backdrop-blur-xl">
+      <div
+        className="
+mx-auto
+    flex
+    h-16
+    sm:h-18
+    md:h-20
+    lg:h-22
+    xl:h-24
+    items-center
+    justify-between
+    px-4
+    sm:px-6
+    lg:px-8
+  "
+      >
         {/* Mobile Hamburger */}
         <div className="lg:hidden">
           <button
@@ -38,26 +53,31 @@ const Navbar = () => {
         </div>
 
         {/* Logo */}
-        <Link href={"/"}>
-          <div
-
-            className="cursor-pointer flex-1 lg:flex-none flex justify-center lg:justify-start"
-          >
-
-
-            <Image
-              src="/icon4.png"
-              alt="Eliteo"
-              width={160}
-              height={100}
-              priority
-
-            />
-          </div>
+        <Link
+          href="/"
+          className="flex flex-1 items-center justify-center lg:flex-none lg:justify-start"
+        >
+          <Image
+            src="/icon4.png"
+            alt="Eliteo"
+            width={220}
+            height={100}
+            priority
+            className="
+      h-auto
+      w-[120px]
+      sm:w-[140px]
+      md:w-[160px]
+      lg:w-[180px]
+      xl:w-[200px]
+      2xl:w-[220px]
+      object-contain
+    "
+          />
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden  lg:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-5 xl:gap-7 2xl:gap-9">
           <Link
             href="/"
             className="relative font-medium text-gray-700 hover:text-black transition group"
