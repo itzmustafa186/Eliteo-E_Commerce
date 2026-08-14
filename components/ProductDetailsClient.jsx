@@ -1,27 +1,42 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 import Image from "next/image";
-import { assets } from "@/assets/assets";
 import { useAppContext } from "@/context/AppContext";
 import ProductCard from "./ProductCard";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ReviewSection from "./ReviewSection";
+import { assets } from "@/assets/assets";
 
-
-const ProductDetailsClient = ({ productData, featuredProducts, reviews }) => {
+const ProductDetailsClient = ({
+    productData,
+    featuredProducts = [],
+    reviews = [],
+}) => {
     const { router, addToCart } = useAppContext();
 
     const [mainImage, setMainImage] = useState(null);
+
     if (!productData) {
-        return <p>Product not found.</p>;
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-slate-50">
+                <p className="text-slate-500">
+                    Product not found.
+                </p>
+            </div>
+        );
     }
+
     const currentImage = useMemo(
-        () => mainImage || productData.images[0],
+        () => mainImage || productData.images?.[0],
         [mainImage, productData.images]
     );
-
 
     const handleAddToCart = useCallback(() => {
         addToCart(productData._id);
@@ -34,195 +49,318 @@ const ProductDetailsClient = ({ productData, featuredProducts, reviews }) => {
 
     const thumbnails = useMemo(
         () =>
-            productData.images.map((image, index) => (
-                <div
+            productData.images?.map((image, index) => (
+                <button
+                    type="button"
                     key={index}
                     onClick={() => setMainImage(image)}
-                    className={`cursor-pointer rounded-lg overflow-hidden border-2 transition ${currentImage === image
-                        ? "border-orange-500"
-                        : "border-transparent"
+                    className={`relative aspect-square overflow-hidden rounded-xl border-2 bg-white transition-all duration-300 ${currentImage === image
+                            ? "border-indigo-500 shadow-md shadow-indigo-100"
+                            : "border-slate-200 hover:border-indigo-300"
                         }`}
                 >
                     <Image
                         src={image}
-                        alt={productData.name}
-                        width={120}
-                        height={120}
-                        loading="lazy"
-                        className="w-full h-auto object-cover"
+                        alt={`${productData.name} ${index + 1}`}
+                        fill
+                        sizes="100px"
+                        className="object-contain p-2"
                     />
-                </div>
+                </button>
             )),
-        [productData.image, currentImage, productData.name]
-
+        [
+            productData.images,
+            productData.name,
+            currentImage,
+        ]
     );
 
     useEffect(() => {
         router.prefetch("/cart");
     }, [router]);
-    return (<>
-        <Navbar />
-        <div className="px-6 md:px-16 lg:px-32 pt-14 space-y-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-                <div className="px-5 lg:px-16 xl:px-20">
-                    <div className="rounded-lg overflow-hidden bg-gray-500/10 mb-4">
-                        <Image
-                            src={currentImage}
-                            alt={productData.name}
-                            width={900}
-                            height={900}
-                            priority
-                            quality={85}
-                            sizes="(max-width:768px)100vw,50vw"
-                            className="w-full h-auto object-contain transition-all duration-300"
-                        />
+
+    const discount =
+        productData.price > 0
+            ? Math.round(
+                ((productData.price - productData.offerPrice) /
+                    productData.price) *
+                100
+            )
+            : 0;
+
+    return (
+        <>
+            <Navbar />
+
+            <main className="min-h-screen bg-slate-50">
+                <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+
+                    {/* Breadcrumb */}
+                    <div className="mb-8 flex items-center gap-2 text-sm text-slate-400">
+                        <span>Home</span>
+                        <span>/</span>
+                        <span>{productData.category}</span>
+                        <span>/</span>
+                        <span className="truncate text-slate-600">
+                            {productData.name}
+                        </span>
                     </div>
 
-                    <div className="grid grid-cols-4 gap-4">
-                        {thumbnails}
-                    </div>
-                </div>
+                    {/* Product */}
+                    <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
 
-                <div className="flex flex-col">
-                    <h1 className="text-3xl font-medium text-gray-800/90 mb-4">
-                        {productData.name}
-                    </h1>
-                    <div className="flex items-center gap-2">
+                        {/* =================================
+                            PRODUCT IMAGES
+                        ================================= */}
+                        <div>
+                            <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
 
-                        {
-                            productData.rating > 0 ? (
-                                <>
-                                    <div className="flex items-center gap-0.5">
+                                {discount > 0 && (
+                                    <span className="absolute left-5 top-5 z-10 rounded-full bg-emerald-600 px-4 py-1.5 text-xs font-bold text-white shadow-md">
+                                        SAVE {discount}%
+                                    </span>
+                                )}
 
-                                        {Array.from({ length: 5 }).map((_, index) => (
-                                            <Image
-                                                key={index}
-                                                className="h-4 w-4"
-                                                src={
-                                                    index < Math.round(productData.rating)
-                                                        ? assets.star_icon
-                                                        : assets.star_dull_icon
-                                                }
-                                                alt="star"
-                                            />
-                                        ))}
+                                <div className="relative aspect-square w-full">
+                                    <Image
+                                        src={currentImage}
+                                        alt={productData.name}
+                                        fill
+                                        priority
+                                        quality={90}
+                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                        className="object-contain transition-all duration-500"
+                                    />
+                                </div>
+                            </div>
 
+                            {/* Thumbnails */}
+                            <div className="mt-5 grid grid-cols-4 gap-3 sm:grid-cols-5">
+                                {thumbnails}
+                            </div>
+                        </div>
+
+                        {/* =================================
+                            PRODUCT INFORMATION
+                        ================================= */}
+                        <div className="flex flex-col">
+
+                            {/* Category */}
+                            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-indigo-500">
+                                {productData.category}
+                            </p>
+
+                            {/* Product Name */}
+                            <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+                                {productData.name}
+                            </h1>
+
+                            {/* Rating */}
+                            <div className="mt-5 flex items-center gap-3">
+                                {productData.rating > 0 ? (
+                                    <>
+                                        <div className="flex items-center gap-1">
+                                            {Array.from({ length: 5 }).map(
+                                                (_, index) => (
+                                                    <Image
+                                                        key={index}
+                                                        src={
+                                                            index <
+                                                                Math.round(
+                                                                    productData.rating
+                                                                )
+                                                                ? assets.star_icon
+                                                                : assets.star_dull_icon
+                                                        }
+                                                        alt="star"
+                                                        width={17}
+                                                        height={17}
+                                                    />
+                                                )
+                                            )}
+                                        </div>
+
+                                        <span className="font-semibold text-slate-700">
+                                            {productData.rating}
+                                        </span>
+
+                                        <span className="text-sm text-slate-400">
+                                            ({productData.reviewCount || 0} Reviews)
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span className="text-sm text-slate-400">
+                                        No reviews yet
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Description */}
+                            <p className="mt-6 leading-7 text-slate-500">
+                                {productData.description}
+                            </p>
+
+                            {/* Price */}
+                            <div className="mt-7 flex flex-wrap items-baseline gap-3">
+                                <span className="text-3xl font-bold text-slate-900">
+                                    Rs.{" "}
+                                    {productData.offerPrice?.toLocaleString()}
+                                </span>
+
+                                {productData.price >
+                                    productData.offerPrice && (
+                                        <span className="text-lg text-slate-400 line-through">
+                                            Rs.{" "}
+                                            {productData.price?.toLocaleString()}
+                                        </span>
+                                    )}
+                            </div>
+
+                            {/* Savings */}
+                            {discount > 0 && (
+                                <p className="mt-2 text-sm font-medium text-emerald-600">
+                                    You save Rs.{" "}
+                                    {(
+                                        productData.price -
+                                        productData.offerPrice
+                                    ).toLocaleString()}
+                                </p>
+                            )}
+
+                            {/* Divider */}
+                            <div className="my-8 h-px bg-slate-200" />
+
+                            {/* Product Information */}
+                            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                                <div className="grid grid-cols-2 border-b border-slate-200">
+                                    <div className="bg-slate-50 px-5 py-4 text-sm font-semibold text-slate-600">
+                                        Brand
                                     </div>
 
-                                    <p className="text-gray-600">
-                                        {productData.rating}
-                                    </p>
+                                    <div className="px-5 py-4 text-sm font-medium text-slate-900">
+                                        {productData.brand || "N/A"}
+                                    </div>
+                                </div>
 
-                                    <span className="text-gray-400">
-                                        ({productData.reviewCount} Reviews)
-                                    </span>
-                                </>
-                            ) : (
+                                <div className="grid grid-cols-2">
+                                    <div className="bg-slate-50 px-5 py-4 text-sm font-semibold text-slate-600">
+                                        Category
+                                    </div>
 
-                                <p className="text-gray-400 text-sm">
-                                    No rating yet
-                                </p>
+                                    <div className="px-5 py-4 text-sm font-medium text-slate-900">
+                                        {productData.category}
+                                    </div>
+                                </div>
+                            </div>
 
-                            )
+                            {/* Stock */}
+                            <div className="mt-6 flex items-center gap-2">
+                                <span
+                                    className={`h-2.5 w-2.5 rounded-full ${Number(productData.stock) > 0
+                                            ? "bg-emerald-500"
+                                            : "bg-red-500"
+                                        }`}
+                                />
 
-                        }
+                                <span
+                                    className={`text-sm font-semibold ${Number(productData.stock) > 0
+                                            ? "text-emerald-600"
+                                            : "text-red-500"
+                                        }`}
+                                >
+                                    {Number(productData.stock) > 0
+                                        ? `${productData.stock} in stock`
+                                        : "Out of stock"}
+                                </span>
+                            </div>
 
-                    </div>
-                    <p className="text-gray-600 mt-3">
-                        {productData.description}
-                    </p>
-                    <p className="text-3xl font-medium mt-6">
-                        Rs.{productData.offerPrice}
-                        <span className="text-base font-normal text-gray-800/60 line-through ml-2">
-                            Rs.{productData.price}
-                        </span>
-                    </p>
-                    <hr className="bg-gray-600 my-6" />
-                    <div className="overflow-x-auto">
-                        <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
-                            <table className="w-full text-sm">
-                                <tbody>
+                            {/* Actions */}
+                            <div className="mt-7">
+                                {Number(productData.stock) <= 0 ? (
+                                    <div className="flex h-14 w-full items-center justify-center rounded-xl bg-slate-100 text-sm font-bold uppercase tracking-wider text-slate-400">
+                                        Sold Out
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col gap-3 sm:flex-row">
+                                        <button
+                                            onClick={handleAddToCart}
+                                            className="w-full rounded-xl border border-slate-900 bg-white py-3.5 font-semibold text-slate-900 transition hover:bg-slate-900 hover:text-white"
+                                        >
+                                            Add to Cart
+                                        </button>
 
-                                    <tr className="border-b border-gray-200">
-                                        <td className="w-32 bg-gray-50 px-5 py-4 font-semibold text-gray-700">
-                                            Brand
-                                        </td>
-                                        <td className="px-5 py-4 text-gray-900">
-                                            {productData.brand || "N/A"}
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td className="bg-gray-50 px-5 py-4 font-semibold text-gray-700">
-                                            Category
-                                        </td>
-                                        <td className="px-5 py-4 text-gray-900">
-                                            {productData.category}
-                                        </td>
-                                    </tr>
-
-                                </tbody>
-                            </table>
+                                        <button
+                                            onClick={handleBuyNow}
+                                            className="w-full rounded-xl bg-slate-900 py-3.5 font-semibold !text-white shadow-lg shadow-slate-200 transition hover:bg-indigo-600 hover:shadow-indigo-200"
+                                        >
+                                            Buy Now
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
-                    <div className="mt-10 w-full">
-                        {Number(productData.stock) <= 0 ? (
-                            <div className="flex h-14 w-full items-center justify-center rounded-xl bg-gray-100 text-sm font-bold uppercase tracking-wider text-gray-500">
-                                Sold Out
-                            </div>
-                        ) : (
-                            <div className="flex items-center gap-4">
-                                <button
-                                    onClick={handleAddToCart}
-                                    className="w-full rounded-xl bg-orange-500 py-3.5 font-semibold text-white transition hover:bg-orange-600"
-                                >
-                                    Add to Cart
-                                </button>
-
-                                <button
-                                    onClick={handleBuyNow}
-                                    className="w-full rounded-xl bg-orange-500 py-3.5 font-semibold text-white transition hover:bg-orange-600"
-                                >
-                                    Buy Now
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-            <ReviewSection
-                productId={productData._id}
-                rating={productData.rating}
-                reviewCount={productData.reviewCount}
-                reviews={reviews}
-            />
-            <div className="flex flex-col items-center">
-                <div className="flex flex-col items-center mb-4 mt-16">
-                    <p className="text-3xl font-medium">Featured <span className="font-medium text-orange-600">Products</span></p>
-                    <div className="w-28 h-0.5 bg-orange-600 mt-2"></div>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-6 pb-14 w-full">
-                    {featuredProducts.map((product) => (
-                        <ProductCard
-                            key={product._id.toString()}
-                            product={product}
+                    {/* =================================
+                        REVIEWS
+                    ================================= */}
+                    <div className="mt-16">
+                        <ReviewSection
+                            productId={productData._id}
+                            rating={productData.rating}
+                            reviewCount={productData.reviewCount}
+                            reviews={reviews}
                         />
-                    ))}
+                    </div>
+
+                    {/* =================================
+                        FEATURED PRODUCTS
+                    ================================= */}
+                    {featuredProducts.length > 0 && (
+                        <section className="mt-20 border-t border-slate-200 pt-16">
+
+                            <div className="text-center">
+                                <p className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-500">
+                                    You May Also Like
+                                </p>
+
+                                <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                                    Featured Products
+                                </h2>
+
+                                <p className="mx-auto mt-3 max-w-xl text-slate-500">
+                                    Explore more premium products selected
+                                    from our collection.
+                                </p>
+                            </div>
+
+                            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                                {featuredProducts.map((product) => (
+                                    <ProductCard
+                                        key={product._id.toString()}
+                                        product={product}
+                                    />
+                                ))}
+                            </div>
+
+                            <div className="mt-12 flex justify-center">
+                                <button
+                                    onClick={() =>
+                                        router.push("/all-products")
+                                    }
+                                    className="rounded-full border border-slate-200 bg-white px-8 py-3 font-semibold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
+                                >
+                                    Explore More Products
+                                </button>
+                            </div>
+                        </section>
+                    )}
                 </div>
-                <button
-                    onClick={() => router.push("/all-products")}
-                    className="px-8 py-2 mb-16 border rounded text-gray-500/70 hover:bg-slate-50/90 transition"
-                >
-                    See more
-                </button>
-            </div>
-        </div>
-        <Footer />
-    </>
+            </main>
 
-    )
+            <Footer />
+        </>
+    );
 };
-
 
 export default ProductDetailsClient;

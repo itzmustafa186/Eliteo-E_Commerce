@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import connectDB from "@/config/db";
-import Product from "@/models/product";
 import Order from "@/models/order";
 import authSeller from "@/lib/authSeller";
 
@@ -20,6 +19,7 @@ export async function GET() {
                 { status: 401 }
             );
         }
+
         const isSeller = await authSeller(userId);
 
         if (!isSeller) {
@@ -30,27 +30,22 @@ export async function GET() {
                 },
                 { status: 403 }
             );
-        };
+        }
 
-        const sellerProducts = await Product.find({
-            sellerId: userId,
-        }).select("_id");
-
-        const productIds = sellerProducts.map((product) => product._id);
-
-        const orders = await Order.find({
-            "items.product": { $in: productIds },
-        })
+        // Every authorized seller can see every order
+        const orders = await Order.find({})
             .populate("items.product")
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .lean();
 
         return NextResponse.json({
             success: true,
             totalOrders: orders.length,
             orders,
         });
-
     } catch (error) {
+        console.error("SELLER ORDERS ERROR:", error);
+
         return NextResponse.json(
             {
                 success: false,

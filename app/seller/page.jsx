@@ -118,7 +118,7 @@ export default function SellerDashboard() {
 
                     <Link
                         href="/seller/add-product"
-                        className="inline-flex w-fit items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-orange-600 shadow-lg transition hover:scale-105"
+                        className="inline-flex w-fit items-center gap-2 rounded-xl bg-black px-5 py-3 text-sm font-semibold text-orange-600 shadow-lg transition hover:scale-105"
                     >
                         Add Product
                         <ArrowRight size={17} />

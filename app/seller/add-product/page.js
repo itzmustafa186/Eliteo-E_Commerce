@@ -31,35 +31,26 @@ const categories = {
         "Micro USB",
         "Fast Charging",
     ],
-    PowerBanks: [
+    Powerbanks: [
         "10000mAh",
         "20000mAh",
         "Wireless",
         "Fast Charging",
     ],
-    MobileCases: [
-        "Silicone",
-        "Transparent",
-        "Shockproof",
-        "Leather",
+    
+    Handsfree: [
+        "Wireless",
+        "Wire"
     ],
-    ScreenProtectors: [
-        "Tempered Glass",
-        "Privacy Glass",
-        "Matte",
-    ],
-    SmartWatches: [
+   
+    
+    Smartwatches: [
         "Fitness",
         "AMOLED",
         "Calling",
         "Sports",
     ],
 
-    GamingAccessories: [
-        "Triggers",
-        "Cooling Fan",
-        "Gamepad",
-    ],
 };
 
 const AddProduct = () => {

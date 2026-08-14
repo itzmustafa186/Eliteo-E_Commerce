@@ -8,6 +8,8 @@ import FeaturedProduct from "@/components/FeaturedProduct";
 import Banner from "@/components/Banner";
 import NewsLetter from "@/components/NewsLetter";
 import Carousel from "@/models/Carousel";
+import CategorySection from "@/components/CategorySection";
+import HeadlineSection from "@/components/HeadlineSection";
 
 export const revalidate = 60;
 
@@ -47,10 +49,11 @@ export default async function Home() {
   return (
     <>
       <Navbar />
-
+<HeadlineSection/>
       <HeaderSlider carousels={carousels} />
+      <CategorySection />
 
-      <div className="px-6 md:px-16 lg:px-32">
+      <div className="">
         <HomeProducts products={products} />
 
         <FeaturedProduct />

@@ -95,6 +95,7 @@ const productSchema = new mongoose.Schema(
         featured: {
             type: Boolean,
             default: false,
+            index: true,
         },
 
         isActive: {
