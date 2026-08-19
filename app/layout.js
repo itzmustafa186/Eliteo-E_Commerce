@@ -13,23 +13,27 @@ export const metadata = {
   metadataBase: new URL("https://eliteo.pk"),
 
   title: {
-    default: "Eliteo - Online Shopping in Pakistan",
+    default: "Eliteo - Mobile & Tech Accessories in Pakistan",
     template: "%s | Eliteo",
   },
 
   description:
-    "Shop quality electronics, earbuds, headphones, chargers, shoes, beauty products and more online at Eliteo Pakistan.",
+    "Shop premium mobile and tech accessories in Pakistan at Eliteo. Explore earbuds, headphones, chargers, power banks, smartwatches, hands-free and more.",
 
   keywords: [
     "Eliteo",
-    "online shopping Pakistan",
-    "electronics Pakistan",
+    "Eliteo Pakistan",
+    "mobile accessories Pakistan",
+    "tech accessories Pakistan",
     "earbuds Pakistan",
+    "wireless earbuds Pakistan",
     "headphones Pakistan",
+    "handsfree Pakistan",
     "chargers Pakistan",
-    "Hand's Free Pakistan",
-    "Powerbanks Pakistan",
-    "SmartWatches Pakistan",
+    "power banks Pakistan",
+    "smart watches Pakistan",
+    "mobile accessories online Pakistan",
+    "buy accessories online Pakistan",
   ],
 
   robots: {
@@ -42,16 +46,16 @@ export const metadata = {
   },
 
   openGraph: {
-    title: "Eliteo - Online Shopping in Pakistan",
+    title: "Eliteo - Mobile & Tech Accessories in Pakistan",
     description:
-      "Shop electronics, accessories, and more at Eliteo Pakistan.",
-    url: "https://eliteo.pk",
+      "Shop earbuds, headphones, chargers, power banks, smartwatches and other quality tech accessories at Eliteo Pakistan.",
+    url: "https://www.eliteo.pk",
     siteName: "Eliteo",
     type: "website",
   },
 
   alternates: {
-    canonical: "https://eliteo.pk",
+    canonical: "https://www.eliteo.pk",
   },
 };
 const poppins = Poppins({

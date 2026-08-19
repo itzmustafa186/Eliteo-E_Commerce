@@ -4,7 +4,7 @@ import ProductDetailsClient from "@/components/ProductDetailsClient";
 import { notFound } from "next/navigation";
 import Review from "@/models/review";
 
-const baseUrl = "https://eliteo.pk";
+const baseUrl = "https://www.eliteo.pk";
 
 // ===============================
 // SEO Metadata for Every Product
@@ -59,13 +59,13 @@ export async function generateMetadata({ params }) {
 
             images: product.images?.[0]
                 ? [
-                      {
-                          url: product.images[0],
-                          width: 800,
-                          height: 800,
-                          alt: product.name,
-                      },
-                  ]
+                    {
+                        url: product.images[0],
+                        width: 800,
+                        height: 800,
+                        alt: product.name,
+                    },
+                ]
                 : [],
         },
 
