@@ -3,59 +3,117 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X } from "lucide-react";
+import {
+  Menu,
+  X,
+  ChevronDown,
+  ChevronUp,
+  ArrowRight,
+} from "lucide-react";
 import { assets, CartIcon } from "@/assets/assets";
 import { useAppContext } from "@/context/AppContext";
 import { useClerk, UserButton } from "@clerk/nextjs";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
+
 const Navbar = () => {
   const { isSeller, router, user, getCartCount } = useAppContext();
   const { openSignIn } = useClerk();
-  const categories = [
-    "Electronics",
-    "Fashion",
-    "Accessories",
-    "Shoes",
-    "Beauty",
-  ];
-
-
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
+
+  const categories = [
+    {
+      name: "Earbuds",
+      slug: "earbuds",
+
+      image: "/categories/earbuds.png",
+
+    },
+    {
+      name: "Headphones",
+      slug: "headphones",
+
+      image: "/categories/headphones.png",
+
+    },
+    {
+      name: "Chargers",
+      slug: "chargers",
+
+      image: "/categories/chargers.png",
+
+    },
+    {
+      name: "Cables",
+      slug: "cables",
+
+      image: "/categories/cables.png",
+
+    },
+    {
+      name: "Power Banks",
+      slug: "powerbanks",
+      image: "/categories/power-banks.png",
+
+    },
+    {
+      name: "Handsfree",
+      slug: "handsfree",
+      image: "/categories/hand-frees.png",
+    },
+    {
+      name: "Smartwatches",
+      slug: "smartwatches",
+      image: "/categories/smart-watches.png",
+    },
+  ];
+
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+    setCategoryOpen(false);
+  };
+
   return (
-    <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/80 shadow-sm backdrop-blur-xl">
+    <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/90 shadow-sm backdrop-blur-xl">
       <div
         className="
-mx-auto
-    flex
-    h-16
-    sm:h-18
-    md:h-20
-    lg:h-22
-    xl:h-24
-    items-center
-    justify-between
-    px-4
-    sm:px-6
-    lg:px-8
-  "
+          mx-auto
+          flex
+          h-16
+          sm:h-18
+          md:h-20
+          lg:h-22
+          xl:h-24
+          items-center
+          justify-between
+          px-4
+          sm:px-6
+          lg:px-8
+        "
       >
-        {/* Mobile Hamburger */}
+        {/* ================= MOBILE MENU BUTTON ================= */}
         <div className="lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg hover:bg-gray-100 transition"
+            className="
+              flex h-10 w-10 items-center justify-center
+              rounded-full
+              hover:bg-gray-100
+              transition
+            "
+            aria-label="Open menu"
           >
-            <Menu className="w-7 h-7" />
+            <Menu className="h-6 w-6" />
           </button>
         </div>
 
-        {/* Logo */}
+        {/* ================= LOGO ================= */}
         <Link
           href="/"
-          className="flex flex-1 items-center justify-center lg:flex-none lg:justify-start"
+          className="
+            flex flex-1 items-center justify-center
+            lg:flex-none lg:justify-start
+          "
         >
           <Image
             src="/icon4.png"
@@ -64,130 +122,478 @@ mx-auto
             height={100}
             priority
             className="
-      h-auto
-      w-[120px]
-      sm:w-[140px]
-      md:w-[160px]
-      lg:w-[180px]
-      xl:w-[200px]
-      2xl:w-[220px]
-      object-contain
-    "
+              h-auto
+              w-[120px]
+              sm:w-[140px]
+              md:w-[160px]
+              lg:w-[180px]
+              xl:w-[200px]
+              2xl:w-[220px]
+              object-contain
+            "
           />
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* ================= DESKTOP NAVIGATION ================= */}
         <div className="hidden lg:flex items-center gap-5 xl:gap-7 2xl:gap-9">
+
+          {/* HOME */}
           <Link
             href="/"
-            className="relative font-medium text-gray-700 hover:text-black transition group"
+            className="
+              relative
+              font-medium
+              text-gray-700
+              hover:text-black
+              transition
+              group
+            "
           >
             Home
-            <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
+
+            <span
+              className="
+                absolute
+                left-0
+                -bottom-1
+                h-0.5
+                w-0
+                bg-yellow-400
+                transition-all
+                duration-300
+                group-hover:w-full
+              "
+            />
           </Link>
+
+          {/* ================= PRODUCTS MEGA MENU ================= */}
           <div className="relative group">
-            <button className="font-medium text-gray-700 hover:text-black transition">
+
+            <button
+              className="
+                flex
+                items-center
+                gap-1.5
+                font-medium
+                text-gray-700
+                hover:text-black
+                transition
+                py-3
+              "
+            >
               Products
+
+              <ChevronDown
+                className="
+                  w-4 h-4
+                  transition-transform
+                  duration-300
+                  group-hover:rotate-180
+                "
+              />
             </button>
 
-            <div className="absolute left-0 top-full mt-3 w-52 rounded-xl bg-white shadow-lg border opacity-0 invisible translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
-              {categories.map((category) => (
+            {/* Mega Menu */}
+            <div
+              className="
+                absolute
+                left-1/2
+                top-full
+                mt-2
+                w-[620px]
+                -translate-x-1/2
+                rounded-2xl
+                border
+                border-gray-100
+                bg-white
+                p-4
+                shadow-2xl
+
+                opacity-0
+                invisible
+                translate-y-3
+
+                group-hover:opacity-100
+                group-hover:visible
+                group-hover:translate-y-0
+
+                transition-all
+                duration-300
+              "
+            >
+
+              {/* Menu Header */}
+              <div className="mb-4 flex items-center justify-between px-2">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Shop Categories
+                  </h3>
+
+                  <p className="text-xs text-gray-500 mt-1">
+                    Explore our latest collections
+                  </p>
+                </div>
+
                 <Link
-                  key={category}
-                  href={`/category/${category.toLowerCase()}`}
-                  className="block px-4 py-3 hover:bg-gray-50"
+                  href="/all-products"
+                  className="
+                    flex
+                    items-center
+                    gap-1
+                    text-sm
+                    font-medium
+                    text-gray-700
+                    hover:text-black
+                    transition
+                  "
                 >
-                  {category}
+                  View All
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
-              ))}
+              </div>
+
+              {/* Categories Grid */}
+              <div className="grid grid-cols-2 gap-3">
+                {categories.map((category) => (
+                  <Link
+                    key={category.slug}
+                    href={`/category/${category.slug}`}
+                    className="
+                      group/card
+                      flex
+                      items-center
+                      gap-3
+                      rounded-xl
+                      border
+                      border-transparent
+                      p-2
+                      hover:border-gray-200
+                      hover:bg-gray-50
+                      transition-all
+                      duration-300
+                    "
+                  >
+                    {/* Category Image */}
+                    <div
+                      className="
+                        relative
+                        h-16
+                        w-16
+                        shrink-0
+                        overflow-hidden
+                        rounded-lg
+                        bg-gray-100
+                      "
+                    >
+                      <Image
+                        src={category.image}
+                        alt={category.name}
+                        fill
+                        sizes="64px"
+                        className="
+                          object-cover
+                          transition-transform
+                          duration-500
+                          group-hover/card:scale-110
+                        "
+                      />
+                    </div>
+
+                    {/* Category Details */}
+                    <div className="min-w-0">
+                      <h4
+                        className="
+                          font-semibold
+                          text-gray-900
+                          group-hover/card:text-black
+                        "
+                      >
+                        {category.name}
+                      </h4>
+
+
+                    </div>
+
+                    <ArrowRight
+                      className="
+                        ml-auto
+                        h-4
+                        w-4
+                        shrink-0
+                        text-gray-300
+                        opacity-0
+                        -translate-x-1
+                        transition-all
+                        duration-300
+                        group-hover/card:opacity-100
+                        group-hover/card:translate-x-0
+                      "
+                    />
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
 
+          {/* ================= ORDERS ================= */}
           {user ? (
             <>
               <Link
                 href="/my-orders"
-                className="relative font-medium text-gray-700 hover:text-black transition group"
+                className="
+                  relative
+                  font-medium
+                  text-gray-700
+                  hover:text-black
+                  transition
+                  group
+                "
               >
                 My Orders
-                <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-              <Link
-                href="/track-order"
-                className="relative font-medium text-gray-700 hover:text-black transition group"
-              >
-                Track Order
-                <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
+
+                <span
+                  className="
+                    absolute
+                    left-0
+                    -bottom-1
+                    h-0.5
+                    w-0
+                    bg-yellow-400
+                    transition-all
+                    duration-300
+                    group-hover:w-full
+                  "
+                />
               </Link>
 
+              <Link
+                href="/track-order"
+                className="
+                  relative
+                  font-medium
+                  text-gray-700
+                  hover:text-black
+                  transition
+                  group
+                "
+              >
+                Track Order
+
+                <span
+                  className="
+                    absolute
+                    left-0
+                    -bottom-1
+                    h-0.5
+                    w-0
+                    bg-yellow-400
+                    transition-all
+                    duration-300
+                    group-hover:w-full
+                  "
+                />
+              </Link>
             </>
           ) : (
             <Link
               href="/track-order"
-              className="relative font-medium text-gray-700 hover:text-black transition group"
+              className="
+                relative
+                font-medium
+                text-gray-700
+                hover:text-black
+                transition
+                group
+              "
             >
               Track Order
-              <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
+
+              <span
+                className="
+                  absolute
+                  left-0
+                  -bottom-1
+                  h-0.5
+                  w-0
+                  bg-yellow-400
+                  transition-all
+                  duration-300
+                  group-hover:w-full
+                "
+              />
             </Link>
           )}
 
+          {/* ABOUT */}
           <Link
             href="/about"
-            className="relative font-medium text-gray-700 hover:text-black transition group"
+            className="
+              relative
+              font-medium
+              text-gray-700
+              hover:text-black
+              transition
+              group
+            "
           >
             About
-            <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
-          </Link>
-          <Link
-            href="/contact"
-            className="relative font-medium text-gray-700 hover:text-black transition group"
-          >
-            Contact
-            <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
+
+            <span
+              className="
+                absolute
+                left-0
+                -bottom-1
+                h-0.5
+                w-0
+                bg-yellow-400
+                transition-all
+                duration-300
+                group-hover:w-full
+              "
+            />
           </Link>
 
+          {/* CONTACT */}
+          <Link
+            href="/contact"
+            className="
+              relative
+              font-medium
+              text-gray-700
+              hover:text-black
+              transition
+              group
+            "
+          >
+            Contact
+
+            <span
+              className="
+                absolute
+                left-0
+                -bottom-1
+                h-0.5
+                w-0
+                bg-yellow-400
+                transition-all
+                duration-300
+                group-hover:w-full
+              "
+            />
+          </Link>
+
+          {/* SELLER */}
           {isSeller && (
             <button
               onClick={() => router.push("/seller")}
-              className="rounded-full border px-5 py-2 font-medium hover:bg-black hover:text-white transition"
+              className="
+                rounded-full
+                border
+                border-gray-300
+                px-5
+                py-2
+                font-medium
+                hover:bg-black
+                hover:text-white
+                hover:border-black
+                transition
+              "
             >
               Seller Dashboard
             </button>
           )}
         </div>
 
-        {/* Right Icons */}
-        {/* Right Icons */}
-        <div className="flex items-center gap-4">
-          {/* Search - Desktop Only */}
-          <button className="hidden lg:flex items-center justify-center h-10 w-10 rounded-full hover:bg-gray-100 transition">
+        {/* ================= RIGHT SIDE ================= */}
+        <div className="flex items-center gap-2 sm:gap-4">
+
+          {/* SEARCH */}
+          <button
+            className="
+              hidden
+              lg:flex
+              items-center
+              justify-center
+              h-10
+              w-10
+              rounded-full
+              hover:bg-gray-100
+              transition
+            "
+            aria-label="Search"
+          >
             <Image
               src={assets.search_icon}
-              alt="search"
+              alt="Search"
+              width={20}
+              height={20}
               className="w-5 h-5"
             />
           </button>
 
-          {/* Cart */}
+          {/* CART */}
           <button
             onClick={() => router.push("/cart")}
-            className="relative h-11 w-11 rounded-full hover:bg-gray-100 transition flex items-center justify-center"
+            className="
+              relative
+              flex
+              h-10
+              w-10
+              sm:h-11
+              sm:w-11
+              items-center
+              justify-center
+              rounded-full
+              hover:bg-gray-100
+              transition
+            "
+            aria-label="Cart"
           >
             <CartIcon />
 
             {getCartCount() > 0 && (
-              <span className="absolute -top-1 -right-1 flex min-w-[20px] h-5 px-1 items-center justify-center rounded-full bg-yellow-400 text-xs font-semibold shadow">
+              <span
+                className="
+                  absolute
+                  -right-1
+                  -top-1
+                  flex
+                  min-w-[19px]
+                  h-5
+                  px-1
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-yellow-400
+                  text-[11px]
+                  font-bold
+                  text-black
+                  shadow
+                "
+              >
                 {getCartCount()}
               </span>
             )}
           </button>
 
-          {/* User Icon - Mobile */}
+          {/* MOBILE USER */}
           <div className="lg:hidden">
             {user ? (
               <UserButton afterSignOutUrl="/" />
             ) : (
-              <button onClick={openSignIn}>
+              <button
+                onClick={openSignIn}
+                className="
+                  flex
+                  h-10
+                  w-10
+                  items-center
+                  justify-center
+                  rounded-full
+                  hover:bg-gray-100
+                  transition
+                "
+              >
                 <Image
                   src={assets.user_icon}
                   alt="User"
@@ -198,14 +604,27 @@ mx-auto
             )}
           </div>
 
-          {/* User Icon - Desktop */}
+          {/* DESKTOP USER */}
           <div className="hidden lg:block">
             {user ? (
               <UserButton afterSignOutUrl="/" />
             ) : (
               <button
                 onClick={openSignIn}
-                className="hidden lg:flex items-center gap-2 rounded-full border px-4 py-2 hover:bg-black hover:text-white transition"
+                className="
+                  flex
+                  items-center
+                  gap-2
+                  rounded-full
+                  border
+                  border-gray-300
+                  px-4
+                  py-2
+                  hover:bg-black
+                  hover:text-white
+                  hover:border-black
+                  transition
+                "
               >
                 <Image
                   src={assets.user_icon}
@@ -213,6 +632,7 @@ mx-auto
                   width={20}
                   height={20}
                 />
+
                 Account
               </button>
             )}
@@ -220,58 +640,126 @@ mx-auto
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {/* Mobile Sidebar */}
+      {/* ================================================= */}
+      {/* MOBILE SIDEBAR */}
+      {/* ================================================= */}
+
       <div className="lg:hidden">
+
         {/* Overlay */}
         <div
-          onClick={() => setSidebarOpen(false)}
-          className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-300 ${sidebarOpen
-            ? "opacity-100 visible"
-            : "opacity-0 invisible"
-            }`}
+          onClick={closeSidebar}
+          className={`
+            fixed
+            inset-0
+            z-40
+            bg-black/50
+            backdrop-blur-sm
+            transition-opacity
+            duration-300
+            ${sidebarOpen
+              ? "visible opacity-100"
+              : "invisible opacity-0"
+            }
+          `}
         />
 
         {/* Drawer */}
         <aside
-          className={`fixed top-0 left-0 z-50 h-screen w-72 bg-white shadow-2xl transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
-            }`}
+          className={`
+            fixed
+            left-0
+            top-0
+            z-50
+            h-screen
+            w-[85%]
+            max-w-[360px]
+            bg-white
+            shadow-2xl
+            transition-transform
+            duration-300
+            ease-out
+            ${sidebarOpen
+              ? "translate-x-0"
+              : "-translate-x-full"
+            }
+          `}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between border-b px-5 py-4">
+
+          {/* Drawer Header */}
+          <div
+            className="
+              flex
+              items-center
+              justify-between
+              border-b
+              border-gray-100
+              px-5
+              py-4
+            "
+          >
             <Image
               src="/icon4.png"
               alt="Eliteo"
-              width={180}
-              height={100}
-              priority
-
+              width={160}
+              height={70}
+              className="w-[130px] object-contain"
             />
 
             <button
-              onClick={() => setSidebarOpen(false)}
-              className="rounded-md p-2 hover:bg-gray-100"
+              onClick={closeSidebar}
+              className="
+                flex
+                h-10
+                w-10
+                items-center
+                justify-center
+                rounded-full
+                hover:bg-gray-100
+                transition
+              "
             >
               <X className="w-6 h-6" />
             </button>
           </div>
 
-          {/* Links */}
-          <div className="py-4">
+          {/* Mobile Links */}
+          <div className="overflow-y-auto h-[calc(100vh-90px)] py-3">
+
+            {/* HOME */}
             <Link
               href="/"
-              onClick={() => setSidebarOpen(false)}
-              className="block px-6 py-4 hover:bg-gray-100"
+              onClick={closeSidebar}
+              className="
+                block
+                px-6
+                py-4
+                font-medium
+                hover:bg-gray-50
+                transition
+              "
             >
               Home
             </Link>
 
-            <div className="border-t">
+            {/* MOBILE CATEGORIES */}
+            <div className="border-y border-gray-100">
+
               <button
                 onClick={() => setCategoryOpen(!categoryOpen)}
-                className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-100 transition"
+                className="
+                  flex
+                  w-full
+                  items-center
+                  justify-between
+                  px-6
+                  py-4
+                  font-medium
+                  hover:bg-gray-50
+                  transition
+                "
               >
-                <span className="font-medium">Categories</span>
+                <span>Categories</span>
 
                 {categoryOpen ? (
                   <ChevronUp className="w-5 h-5" />
@@ -281,78 +769,200 @@ mx-auto
               </button>
 
               <div
-                className={`overflow-hidden transition-all duration-300 ${categoryOpen ? "max-h-96" : "max-h-0"
-                  }`}
+                className={`
+                  overflow-hidden
+                  transition-all
+                  duration-300
+                  ${categoryOpen
+                    ? "max-h-[600px]"
+                    : "max-h-0"
+                  }
+                `}
               >
-                {categories.map((category) => (
+                <div className="space-y-1 px-3 pb-3">
+
+                  {categories.map((category) => (
+                    <Link
+                      key={category.slug}
+                      href={`/category/${category.slug}`}
+                      onClick={closeSidebar}
+                      className="
+                        group
+                        flex
+                        items-center
+                        gap-3
+                        rounded-xl
+                        p-2
+                        hover:bg-gray-50
+                        transition
+                      "
+                    >
+
+                      {/* Image */}
+                      <div
+                        className="
+                          relative
+                          h-14
+                          w-14
+                          shrink-0
+                          overflow-hidden
+                          rounded-lg
+                          bg-gray-100
+                        "
+                      >
+                        <Image
+                          src={category.image}
+                          alt={category.name}
+                          fill
+                          sizes="56px"
+                          className="
+                            object-cover
+                            transition-transform
+                            duration-300
+                            group-hover:scale-105
+                          "
+                        />
+                      </div>
+
+                      {/* Text */}
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">
+                          {category.name}
+                        </p>
+
+                        <p className="mt-0.5 text-xs text-gray-500">
+                          {category.description}
+                        </p>
+                      </div>
+
+                      <ArrowRight
+                        className="
+                          h-4
+                          w-4
+                          text-gray-400
+                        "
+                      />
+                    </Link>
+                  ))}
+
+                  {/* All Products */}
                   <Link
-                    key={category}
-                    href={`/category/${category.toLowerCase()}`}
-                    onClick={() => {
-                      setSidebarOpen(false);
-                      setCategoryOpen(false);
-                    }}
-                    className="block pl-12 pr-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-black transition"
+                    href="/all-products"
+                    onClick={closeSidebar}
+                    className="
+                      mt-2
+                      flex
+                      items-center
+                      justify-center
+                      gap-2
+                      rounded-xl
+                      bg-black
+                      px-4
+                      py-3
+                      text-sm
+                      font-medium
+                      !text-white
+                      transition
+                      hover:bg-gray-800
+                    "
                   >
-                    {category}
+                    View All Products
+                    <ArrowRight className="h-4 w-4" />
                   </Link>
-                ))}
+
+                </div>
               </div>
             </div>
 
-            {user ? (
-              <>
-                <Link
-                  href="/my-orders"
-                  onClick={() => setSidebarOpen(false)}
-                  className="block px-6 py-4 hover:bg-gray-100"
-                >
-                  My Orders
-                </Link>
-                <Link
-                  href="/track-order"
-                  onClick={() => setSidebarOpen(false)}
-                  className="block px-6 py-4 hover:bg-gray-100"
-                >
-                  Track Order
-                </Link>
-              </>
-            ) : (
+            {/* ORDERS */}
+            {user && (
               <Link
-                href="/track-order"
-                onClick={() => setSidebarOpen(false)}
-                className="block px-6 py-4 hover:bg-gray-100"
+                href="/my-orders"
+                onClick={closeSidebar}
+                className="
+                  block
+                  px-6
+                  py-4
+                  font-medium
+                  hover:bg-gray-50
+                  transition
+                "
               >
-                Track Order
+                My Orders
               </Link>
             )}
+
+            {/* TRACK ORDER */}
+            <Link
+              href="/track-order"
+              onClick={closeSidebar}
+              className="
+                block
+                px-6
+                py-4
+                font-medium
+                hover:bg-gray-50
+                transition
+              "
+            >
+              Track Order
+            </Link>
+
+            {/* ABOUT */}
             <Link
               href="/about"
-              onClick={() => setSidebarOpen(false)}
-              className="block px-6 py-4 hover:bg-gray-100"
+              onClick={closeSidebar}
+              className="
+                block
+                px-6
+                py-4
+                font-medium
+                hover:bg-gray-50
+                transition
+              "
             >
               About
             </Link>
 
+            {/* CONTACT */}
             <Link
               href="/contact"
-              onClick={() => setSidebarOpen(false)}
-              className="block px-6 py-4 hover:bg-gray-100"
+              onClick={closeSidebar}
+              className="
+                block
+                px-6
+                py-4
+                font-medium
+                hover:bg-gray-50
+                transition
+              "
             >
               Contact
             </Link>
 
+            {/* SELLER */}
             {isSeller && (
               <button
                 onClick={() => {
                   router.push("/seller");
-                  setSidebarOpen(false);
+                  closeSidebar();
                 }}
-                className="w-full px-6 py-4 text-left hover:bg-gray-100"
+                className="
+                  w-full
+                  border-t
+                  border-gray-100
+                  px-6
+                  py-4
+                  text-left
+                  font-medium
+                  hover:bg-gray-50
+                  transition
+                "
               >
                 Seller Dashboard
               </button>
             )}
+
           </div>
         </aside>
       </div>
