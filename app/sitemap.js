@@ -6,15 +6,33 @@ export default async function sitemap() {
 
     await connectDB();
 
-    const products = await Product.find({ isActive: true })
-        .select("slug")
+    const products = await Product.find({
+        isActive: true,
+    })
+        .select("slug updatedAt")
         .lean();
 
     const productUrls = products.map((product) => ({
         url: `${baseUrl}/product/${product.slug}`,
-        lastModified: new Date(),
+        lastModified: product.updatedAt || new Date(),
         changeFrequency: "weekly",
         priority: 0.8,
+    }));
+
+    const categories = [
+        "headphones",
+        "earbuds",
+        "chargers",
+        "powerbanks",
+        "cables",
+        "smartwatches"
+    ];
+
+    const categoryUrls = categories.map((category) => ({
+        url: `${baseUrl}/category/${category}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly",
+        priority: 0.7,
     }));
 
     return [
@@ -24,6 +42,7 @@ export default async function sitemap() {
             changeFrequency: "daily",
             priority: 1,
         },
+
         {
             url: `${baseUrl}/all-products`,
             lastModified: new Date(),
@@ -31,6 +50,7 @@ export default async function sitemap() {
             priority: 0.9,
         },
 
+        ...categoryUrls,
         ...productUrls,
     ];
 }
