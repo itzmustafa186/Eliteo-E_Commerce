@@ -5,11 +5,12 @@ import Footer from "@/components/Footer";
 import HeaderSlider from "@/components/HeaderSlider";
 import HomeProducts from "@/components/HomeProducts";
 import FeaturedProduct from "@/components/FeaturedProduct";
-import Banner from "@/components/Banner";
-import NewsLetter from "@/components/NewsLetter";
+
 import Carousel from "@/models/Carousel";
 import CategorySection from "@/components/CategorySection";
 import HeadlineSection from "@/components/HeadlineSection";
+import WhyChooseEliteo from "@/components/WhyChooseEliteo";
+
 
 export const revalidate = 60;
 
@@ -135,13 +136,13 @@ export default async function Home() {
       <CategorySection />
 
       <div>
+        
         <HomeProducts products={products} />
 
-        <FeaturedProduct />
+       
+<WhyChooseEliteo/>
 
-        <Banner />
-
-        <NewsLetter />
+       
       </div>
 
       <Footer />
