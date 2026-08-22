@@ -10,7 +10,7 @@ import { Poppins } from "next/font/google";
 // const outfit = Outfit({ subsets: ['latin'], weight: ["300", "400", "500"] })
 
 export const metadata = {
-  metadataBase: new URL("https://eliteo.pk"),
+  metadataBase: new URL("https://www.eliteo.pk"),
 
   title: {
     default: "Eliteo - Mobile & Tech Accessories in Pakistan",

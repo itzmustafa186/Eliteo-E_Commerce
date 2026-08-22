@@ -131,7 +131,7 @@ export async function generateMetadata({ params }) {
         };
     }
 
-    const canonicalUrl = `https://eliteo.pk/category/${slug}`;
+    const canonicalUrl = `https://www.eliteo.pk/category/${slug}`;
 
     return {
         title: seo.title,
