@@ -8,13 +8,16 @@ export default async function sitemap() {
 
     const products = await Product.find({
         isActive: true,
+        slug: { $exists: true, $ne: "" },
     })
         .select("slug updatedAt")
         .lean();
 
     const productUrls = products.map((product) => ({
         url: `${baseUrl}/product/${product.slug}`,
-        lastModified: product.updatedAt || new Date(),
+        lastModified: product.updatedAt
+            ? new Date(product.updatedAt)
+            : new Date(),
         changeFrequency: "weekly",
         priority: 0.8,
     }));
@@ -25,7 +28,7 @@ export default async function sitemap() {
         "chargers",
         "powerbanks",
         "cables",
-        "smartwatches"
+        "smartwatches",
     ];
 
     const categoryUrls = categories.map((category) => ({
