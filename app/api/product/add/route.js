@@ -1,12 +1,15 @@
 import connectDB from "@/config/db";
 import authSeller from "@/lib/authSeller";
 import Product from "@/models/product";
+
 import { auth } from "@clerk/nextjs/server";
 import { v2 as cloudinary } from "cloudinary";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import slugify from "slugify";
 import crypto from "crypto";
+import Company from "@/models/Company";
+
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -52,7 +55,9 @@ export async function POST(request) {
         const description = formData.get("description");
         const category = formData.get("category");
         const subCategory = formData.get("subCategory") || "";
-        const brand = formData.get("brand") || "";
+
+        // NEW: Company ID
+        const company = formData.get("company");
 
         const price = Number(formData.get("price"));
         const offerPrice = Number(formData.get("offerPrice"));
@@ -60,11 +65,12 @@ export async function POST(request) {
 
         const files = formData.getAll("images");
 
-        // Validation
+        // Basic validation
         if (
             !name ||
             !description ||
             !category ||
+            !company ||
             price <= 0 ||
             offerPrice < 0 ||
             stock < 0
@@ -78,6 +84,7 @@ export async function POST(request) {
             );
         }
 
+        // Check offer price
         if (offerPrice > price) {
             return NextResponse.json(
                 {
@@ -88,6 +95,23 @@ export async function POST(request) {
             );
         }
 
+        // Check company exists
+        const existingCompany = await Company.findOne({
+            _id: company,
+            isActive: true,
+        });
+
+        if (!existingCompany) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Selected company does not exist.",
+                },
+                { status: 400 }
+            );
+        }
+
+        // Check images
         if (files.length === 0 || !files[0].name) {
             return NextResponse.json(
                 {
@@ -97,6 +121,8 @@ export async function POST(request) {
                 { status: 400 }
             );
         }
+
+        // Generate slug
         const slug =
             slugify(name, {
                 lower: true,
@@ -105,8 +131,13 @@ export async function POST(request) {
             "-" +
             crypto.randomBytes(3).toString("hex");
 
-        const sku = `ELT-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+        // Generate SKU
+        const sku = `ELT-${crypto
+            .randomBytes(4)
+            .toString("hex")
+            .toUpperCase()}`;
 
+        // Upload images to Cloudinary
         const uploadResults = await Promise.all(
             files.map(async (file) => {
                 const bytes = await file.arrayBuffer();
@@ -132,8 +163,11 @@ export async function POST(request) {
                             ],
                         },
                         (error, result) => {
-                            if (error) reject(error);
-                            else resolve(result);
+                            if (error) {
+                                reject(error);
+                            } else {
+                                resolve(result);
+                            }
                         }
                     );
 
@@ -141,7 +175,10 @@ export async function POST(request) {
                 });
             })
         );
-        const imageUrls = uploadResults.map((item) => item.secure_url);
+
+        const imageUrls = uploadResults.map(
+            (item) => item.secure_url
+        );
 
         if (imageUrls.length === 0) {
             return NextResponse.json(
@@ -153,6 +190,7 @@ export async function POST(request) {
             );
         }
 
+        // Create product
         const product = await Product.create({
             sellerId: userId,
 
@@ -163,7 +201,9 @@ export async function POST(request) {
 
             category,
             subCategory,
-            brand,
+
+            // NEW: Company reference
+            company: existingCompany._id,
 
             images: imageUrls,
 
@@ -177,10 +217,10 @@ export async function POST(request) {
             isActive: true,
         });
 
+        // Revalidate pages
         revalidatePath("/");
         revalidatePath("/all-products");
         revalidatePath("/seller/product-list");
-        
 
         return NextResponse.json(
             {
@@ -191,7 +231,7 @@ export async function POST(request) {
             { status: 201 }
         );
     } catch (error) {
-        console.error(error);
+        console.error("ADD PRODUCT ERROR:", error);
 
         return NextResponse.json(
             {

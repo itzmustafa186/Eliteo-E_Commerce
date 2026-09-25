@@ -4,6 +4,6 @@ export default function robots() {
             userAgent: "*",
             allow: "/",
         },
-        sitemap: "https://eliteo.pk/sitemap.xml",
+        sitemap: "https://www.eliteo.pk/sitemap.xml",
     };
 }

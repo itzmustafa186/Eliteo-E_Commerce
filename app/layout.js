@@ -27,17 +27,7 @@ export const metadata = {
   creator: "Eliteo",
   publisher: "Eliteo",
 
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
-    },
-  },
+
 
   alternates: {
     canonical: "https://www.eliteo.pk",

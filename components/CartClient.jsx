@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import Navbar from "./Navbar";
+import Navbar from "./navbar/Navbar";
 import Footer from "./Footer";
 import { assets } from "@/assets/assets";
 import { useAppContext } from "@/context/AppContext";

@@ -5,21 +5,20 @@
    ======================================== */
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #fafafa;
+  --foreground: #172033;
 
-  --primary: #4f46e5;
-  --primary-dark: #4338ca;
-  --primary-light: #eef2ff;
+  --primary: #facc15;
+  --primary-dark: #eab308;
+  --primary-light: #f7f3ea;
 
-  --secondary: #f1f5f9;
-  --border: #e2e8f0;
+  --secondary: #f4efe6;
+  --border: #e8e1d6;
+  --muted: #6b7280;
 
-  --muted: #64748b;
-  --dark: #0f172a;
+  --dark: #172033;
   --white: #ffffff;
 }
-
 
 /* ========================================
    BASE
@@ -167,6 +166,14 @@ img {
 
 
 /* ========================================
+   BUTTONS
+   ======================================== */
+
+button {
+  cursor: pointer;
+}
+
+/* ========================================
    PRIMARY BUTTON
    ======================================== */
 
@@ -176,10 +183,11 @@ img {
   justify-content: center;
   gap: 0.5rem;
 
-  background: #0f172a;
-  color: #ffffff !important;
+  background: #facc15;
+  color: #172033 !important;
 
   padding: 0.75rem 1.5rem;
+  border: 1px solid #e5b900;
   border-radius: 9999px;
 
   font-weight: 600;
@@ -193,14 +201,14 @@ img {
 }
 
 .btn-primary:hover {
-  background: #4f46e5;
-  color: #ffffff !important;
+  background: #eab308;
+  color: #172033 !important;
+
   transform: translateY(-2px);
 
   box-shadow:
-    0 10px 25px rgba(79, 70, 229, 0.25);
+    0 10px 25px rgba(234, 179, 8, 0.25);
 }
-
 
 /* ========================================
    SECONDARY BUTTON
@@ -213,10 +221,9 @@ img {
   gap: 0.5rem;
 
   background: #ffffff;
-  color: white !important;
+  color: #172033 !important;
 
   padding: 0.75rem 1.5rem;
-
   border: 1px solid #e2e8f0;
   border-radius: 9999px;
 
@@ -228,9 +235,9 @@ img {
 }
 
 .btn-secondary:hover {
-  background: #eef2ff;
-  border-color: #c7d2fe;
-  color: #4f46e5 !important;
+  background: #f7f3ea;
+  border-color: #d8c29a;
+  color: #9b7a42 !important;
 }
 
 

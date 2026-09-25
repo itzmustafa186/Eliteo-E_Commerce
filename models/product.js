@@ -1,3 +1,4 @@
+
 import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema(
@@ -5,7 +6,7 @@ const productSchema = new mongoose.Schema(
         sellerId: {
             type: String,
             required: true,
-            index: true,
+           
         },
 
         name: {
@@ -41,9 +42,12 @@ const productSchema = new mongoose.Schema(
             index: true,
         },
 
-        brand: {
-            type: String,
-            default: "",
+        // Company / Brand
+        company: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Company",
+            required: true,
+            index: true,
         },
 
         images: [
@@ -112,6 +116,8 @@ const productSchema = new mongoose.Schema(
 // Indexes
 productSchema.index({ name: "text", description: "text" });
 productSchema.index({ category: 1, isActive: 1 });
+productSchema.index({ company: 1, isActive: 1 });
+productSchema.index({ category: 1, company: 1, isActive: 1 });
 productSchema.index({ sellerId: 1 });
 productSchema.index({ createdAt: -1 });
 
@@ -120,3 +126,4 @@ const Product =
     mongoose.model("Product", productSchema);
 
 export default Product;
+

@@ -7,6 +7,29 @@ import Review from "@/models/review";
 const baseUrl = "https://www.eliteo.pk";
 
 // ======================================================
+// HELPER — SERIALIZE PRODUCT
+// ======================================================
+
+const serializeProduct = (product) => ({
+    ...product,
+    _id: product._id.toString(),
+
+    sellerId: product.sellerId?.toString(),
+
+    company: product.company
+        ? {
+              _id: product.company._id.toString(),
+              name: product.company.name,
+              slug: product.company.slug,
+              logo: product.company.logo,
+          }
+        : null,
+
+    createdAt: product.createdAt?.toISOString(),
+    updatedAt: product.updatedAt?.toISOString(),
+});
+
+// ======================================================
 // SEO METADATA
 // ======================================================
 
@@ -27,15 +50,11 @@ export async function generateMetadata({ params }) {
     if (!product) {
         return {
             title: "Product Not Found | Eliteo",
-            description: "The requested product could not be found.",
-            robots: {
-                index: false,
-                follow: false,
-            },
+            description:
+                "The requested product could not be found.",
         };
     }
 
-    // Remove HTML from description
     const cleanDescription =
         product.description
             ?.replace(/<[^>]*>/g, "")
@@ -50,7 +69,9 @@ export async function generateMetadata({ params }) {
 
     const productUrl = `${baseUrl}/product/${product.slug}`;
 
-    const imageUrl = product.images?.[0] || `${baseUrl}/og-image.jpg`;
+    const imageUrl =
+        product.images?.[0] ||
+        `${baseUrl}/og-image.jpg`;
 
     return {
         title: `Buy ${product.name} Online in Pakistan`,
@@ -76,15 +97,10 @@ export async function generateMetadata({ params }) {
 
         openGraph: {
             title: `${product.name} | Eliteo`,
-
             description,
-
             url: productUrl,
-
             siteName: "Eliteo",
-
             type: "website",
-
             locale: "en_PK",
 
             images: [
@@ -99,43 +115,45 @@ export async function generateMetadata({ params }) {
 
         twitter: {
             card: "summary_large_image",
-
             title: `${product.name} | Eliteo`,
-
             description,
-
             images: [imageUrl],
         },
     };
 }
-
 
 // ======================================================
 // PRODUCT PAGE
 // ======================================================
 
 export default async function ProductPage({ params }) {
-
     const { slug } = await params;
 
     await connectDB();
+
+    // ==================================================
+    // MAIN PRODUCT
+    // ==================================================
 
     const productData = await Product.findOne({
         slug,
         isActive: true,
     })
         .select(
-            "name description images offerPrice price category brand slug rating reviewCount stock sku"
+            "name description images offerPrice price category subCategory brand slug rating reviewCount stock sku sellerId company createdAt updatedAt"
         )
+        .populate({
+            path: "company",
+            select: "name slug logo",
+        })
         .lean();
 
     if (!productData) {
         notFound();
     }
 
-
     // ==================================================
-    // RELATED PRODUCTS
+    // RELATED / FEATURED PRODUCTS
     // ==================================================
 
     const featuredProducts = await Product.find({
@@ -147,9 +165,15 @@ export default async function ProductPage({ params }) {
 
         isActive: true,
     })
+        .populate({
+            path: "company",
+            select: "name slug logo",
+        })
+        .sort({
+            createdAt: -1,
+        })
         .limit(5)
         .lean();
-
 
     // ==================================================
     // REVIEWS
@@ -165,27 +189,22 @@ export default async function ProductPage({ params }) {
             .lean()
     ).map((review) => ({
         ...review,
-
         _id: review._id.toString(),
-
         productId: review.productId.toString(),
     }));
-
 
     // ==================================================
     // PRODUCT JSON-LD
     // ==================================================
 
-    const productUrl =
-        `${baseUrl}/product/${productData.slug}`;
+    const productUrl = `${baseUrl}/product/${productData.slug}`;
 
     const imageUrl =
         productData.images?.[0] ||
         `${baseUrl}/og-image.jpg`;
 
     const price =
-        productData.offerPrice ||
-        productData.price;
+        productData.offerPrice || productData.price;
 
     const cleanDescription =
         productData.description
@@ -194,9 +213,7 @@ export default async function ProductPage({ params }) {
             .trim() ||
         `Buy ${productData.name} online in Pakistan at Eliteo.`;
 
-
     const productSchema = {
-
         "@context": "https://schema.org",
 
         "@type": "Product",
@@ -205,16 +222,23 @@ export default async function ProductPage({ params }) {
 
         description: cleanDescription,
 
-        image: productData.images || [imageUrl],
+        image: productData.images?.length
+            ? productData.images
+            : [imageUrl],
 
         url: productUrl,
 
-        brand: productData.brand
+        brand: productData.company?.name
             ? {
-                "@type": "Brand",
-                name: productData.brand,
-            }
-            : undefined,
+                  "@type": "Brand",
+                  name: productData.company.name,
+              }
+            : productData.brand
+              ? {
+                    "@type": "Brand",
+                    name: productData.brand,
+                }
+              : undefined,
 
         category: productData.category,
 
@@ -248,68 +272,44 @@ export default async function ProductPage({ params }) {
             productData.reviewCount > 0 &&
             productData.rating > 0
                 ? {
-                    "@type": "AggregateRating",
-
-                    ratingValue:
-                        productData.rating,
-
-                    reviewCount:
-                        productData.reviewCount,
-
-                    bestRating: 5,
-
-                    worstRating: 1,
-                }
+                      "@type": "AggregateRating",
+                      ratingValue: productData.rating,
+                      reviewCount:
+                          productData.reviewCount,
+                      bestRating: 5,
+                      worstRating: 1,
+                  }
                 : undefined,
     };
 
-
-    // Remove undefined values
     const cleanSchema = JSON.parse(
         JSON.stringify(productSchema)
     );
 
+    // ==================================================
+    // RENDER
+    // ==================================================
 
     return (
         <>
-
-            {/* =========================================
-                PRODUCT STRUCTURED DATA
-            ========================================= */}
-
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
-                    __html: JSON.stringify(cleanSchema),
+                    __html: JSON.stringify(
+                        cleanSchema
+                    ),
                 }}
             />
-
-
-            {/* =========================================
-                PRODUCT UI
-            ========================================= */}
 
             <ProductDetailsClient
-
-                productData={{
-                    ...productData,
-
-                    _id:
-                        productData._id.toString(),
-                }}
-
-                featuredProducts={featuredProducts.map(
-                    (product) => ({
-                        ...product,
-
-                        _id:
-                            product._id.toString(),
-                    })
+                productData={serializeProduct(
+                    productData
                 )}
-
+                featuredProducts={featuredProducts.map(
+                    serializeProduct
+                )}
                 reviews={reviews}
             />
-
         </>
     );
 }

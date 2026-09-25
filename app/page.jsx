@@ -1,6 +1,6 @@
 import connectDB from "@/config/db";
 import Product from "@/models/product";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/Footer";
 import HeaderSlider from "@/components/HeaderSlider";
 import HomeProducts from "@/components/HomeProducts";
@@ -10,7 +10,6 @@ import Carousel from "@/models/Carousel";
 import CategorySection from "@/components/CategorySection";
 import HeadlineSection from "@/components/HeadlineSection";
 import WhyChooseEliteo from "@/components/WhyChooseEliteo";
-
 
 export const revalidate = 60;
 
@@ -22,18 +21,31 @@ export default async function Home() {
   // ==========================================
   // FETCH PRODUCTS
   // ==========================================
-
+  // ==========================================
+  // FETCH PRODUCTS
+  // ==========================================
   const products = (
     await Product.find({
       isActive: true,
     })
+      .populate({
+        path: "company",
+        select: "name slug logo",
+      })
       .sort({ createdAt: -1 })
       .lean()
   ).map((product) => ({
     ...product,
     _id: product._id.toString(),
+    company: product.company
+      ? {
+          _id: product.company._id.toString(),
+          name: product.company.name,
+          slug: product.company.slug,
+          logo: product.company.logo,
+        }
+      : null,
   }));
-
 
   // ==========================================
   // FETCH ACTIVE CAROUSELS
@@ -49,7 +61,6 @@ export default async function Home() {
     ...carousel,
     _id: carousel._id.toString(),
   }));
-
 
   // ==========================================
   // WEBSITE SCHEMA
@@ -73,7 +84,6 @@ export default async function Home() {
       url: baseUrl,
     },
   };
-
 
   // ==========================================
   // ORGANIZATION SCHEMA
@@ -100,7 +110,6 @@ export default async function Home() {
     ],
   };
 
-
   return (
     <>
       {/* ==========================================
@@ -114,7 +123,6 @@ export default async function Home() {
         }}
       />
 
-
       {/* ==========================================
           ORGANIZATION SCHEMA
       ========================================== */}
@@ -126,7 +134,6 @@ export default async function Home() {
         }}
       />
 
-
       <Navbar />
 
       <HeadlineSection />
@@ -136,13 +143,11 @@ export default async function Home() {
       <CategorySection />
 
       <div>
-        
-        <HomeProducts products={products} />
+        <HomeProducts
+          products={products.filter((product) => product.featured === true)}
+        />
 
-       
-<WhyChooseEliteo/>
-
-       
+        <WhyChooseEliteo />
       </div>
 
       <Footer />

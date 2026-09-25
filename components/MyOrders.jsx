@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/Footer";
 import {
     Package,
