@@ -1,6 +1,5 @@
 "use client";
 
-import { productsDummyData, userDummyData } from "@/assets/assets";
 import { useAuth, useUser } from "@clerk/nextjs";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -16,6 +15,20 @@ export const AppContext = createContext();
 
 export const useAppContext = () => useContext(AppContext);
 
+const getInitialGuestCart = () => {
+    if (typeof window === "undefined") {
+        return {};
+    }
+
+    try {
+        return JSON.parse(
+            localStorage.getItem("guestCart") || "{}"
+        );
+    } catch {
+        return {};
+    }
+};
+
 export const AppContextProvider = ({ children }) => {
     const currency = "Rs.";
 
@@ -26,7 +39,12 @@ export const AppContextProvider = ({ children }) => {
     const [products, setProducts] = useState([]);
     const [userData, setUserData] = useState(false);
     const [isSeller, setIsSeller] = useState(false);
-    const [cartItems, setCartItems] = useState({});
+
+    // Load guest cart during initial state creation.
+    // This avoids calling setState synchronously inside an effect.
+    const [cartItems, setCartItems] = useState(
+        getInitialGuestCart
+    );
 
     /* =========================================================
        FETCH PRODUCTS
@@ -34,13 +52,18 @@ export const AppContextProvider = ({ children }) => {
 
     const fetchProductData = async () => {
         try {
-            const { data } = await axios.get("/api/product/list");
+            const { data } = await axios.get(
+                "/api/product/list"
+            );
 
             if (data.success) {
-                setProducts(data.products);
+                setProducts(data.products || []);
             }
         } catch (error) {
-            console.error("FETCH PRODUCT ERROR:", error);
+            console.error(
+                "FETCH PRODUCT ERROR:",
+                error
+            );
         }
     };
 
@@ -56,29 +79,46 @@ export const AppContextProvider = ({ children }) => {
                 return;
             }
 
-            const role = user?.publicMetadata?.role;
-
-            setIsSeller(role === "seller");
-
             const token = await getToken();
 
             if (!token) {
                 setUserData(false);
+                setIsSeller(false);
                 return;
             }
 
-            const { data } = await axios.get("/api/user/data", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const { data } = await axios.get(
+                "/api/user/data",
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
             if (data.success) {
                 setUserData(data.user);
-                setCartItems(data.user.cartItems || {});
+
+                setCartItems(
+                    data.user?.cartItems || {}
+                );
+
+                setIsSeller(
+                    user?.publicMetadata?.role ===
+                        "seller"
+                );
+            } else {
+                setUserData(false);
+                setIsSeller(false);
             }
         } catch (error) {
-            console.error("FETCH USER DATA ERROR:", error);
+            console.error(
+                "FETCH USER DATA ERROR:",
+                error
+            );
+
+            setUserData(false);
+            setIsSeller(false);
         }
     };
 
@@ -89,17 +129,20 @@ export const AppContextProvider = ({ children }) => {
     const addToCart = async (itemId) => {
         try {
             if (!user) {
-                const updatedCart = {
-                    ...cartItems,
-                    [itemId]: (cartItems[itemId] || 0) + 1,
-                };
+                setCartItems((previousCart) => {
+                    const updatedCart = {
+                        ...previousCart,
+                        [itemId]:
+                            (previousCart[itemId] || 0) + 1,
+                    };
 
-                setCartItems(updatedCart);
+                    localStorage.setItem(
+                        "guestCart",
+                        JSON.stringify(updatedCart)
+                    );
 
-                localStorage.setItem(
-                    "guestCart",
-                    JSON.stringify(updatedCart)
-                );
+                    return updatedCart;
+                });
 
                 toast.success("Added to cart");
                 return;
@@ -107,11 +150,17 @@ export const AppContextProvider = ({ children }) => {
 
             const token = await getToken();
 
+            if (!token) {
+                toast.error("Please login first");
+                return;
+            }
+
             const { data } = await axios.post(
                 "/api/cart/update",
                 {
                     itemId,
-                    quantity: (cartItems[itemId] || 0) + 1,
+                    quantity:
+                        (cartItems[itemId] || 0) + 1,
                 },
                 {
                     headers: {
@@ -121,11 +170,15 @@ export const AppContextProvider = ({ children }) => {
             );
 
             if (data.success) {
-                setCartItems(data.cartItems);
+                setCartItems(data.cartItems || {});
                 toast.success("Added to cart");
             }
         } catch (error) {
-            console.error("ADD CART ERROR:", error);
+            console.error(
+                "ADD CART ERROR:",
+                error
+            );
+
             toast.error("Something went wrong");
         }
     };
@@ -134,29 +187,38 @@ export const AppContextProvider = ({ children }) => {
        UPDATE CART
     ========================================================= */
 
-    const updateCartQuantity = async (itemId, quantity) => {
+    const updateCartQuantity = async (
+        itemId,
+        quantity
+    ) => {
         try {
             if (!user) {
-                const updatedCart = {
-                    ...cartItems,
-                    [itemId]: quantity,
-                };
+                setCartItems((previousCart) => {
+                    const updatedCart = {
+                        ...previousCart,
+                        [itemId]: quantity,
+                    };
 
-                if (quantity <= 0) {
-                    delete updatedCart[itemId];
-                }
+                    if (quantity <= 0) {
+                        delete updatedCart[itemId];
+                    }
 
-                setCartItems(updatedCart);
+                    localStorage.setItem(
+                        "guestCart",
+                        JSON.stringify(updatedCart)
+                    );
 
-                localStorage.setItem(
-                    "guestCart",
-                    JSON.stringify(updatedCart)
-                );
+                    return updatedCart;
+                });
 
                 return;
             }
 
             const token = await getToken();
+
+            if (!token) {
+                return;
+            }
 
             const { data } = await axios.post(
                 "/api/cart/update",
@@ -172,10 +234,15 @@ export const AppContextProvider = ({ children }) => {
             );
 
             if (data.success) {
-                setCartItems(data.cartItems);
+                setCartItems(
+                    data.cartItems || {}
+                );
             }
         } catch (error) {
-            console.error("UPDATE CART ERROR:", error);
+            console.error(
+                "UPDATE CART ERROR:",
+                error
+            );
         }
     };
 
@@ -185,7 +252,8 @@ export const AppContextProvider = ({ children }) => {
 
     const getCartCount = () => {
         return Object.values(cartItems).reduce(
-            (total, quantity) => total + Number(quantity || 0),
+            (total, quantity) =>
+                total + Number(quantity || 0),
             0
         );
     };
@@ -198,14 +266,21 @@ export const AppContextProvider = ({ children }) => {
         return Object.entries(cartItems).reduce(
             (total, [itemId, quantity]) => {
                 const product = products.find(
-                    (product) => product._id === itemId
+                    (product) =>
+                        product._id === itemId
                 );
 
-                if (!product) return total;
+                if (!product) {
+                    return total;
+                }
 
                 return (
                     total +
-                    Number(product.offerPrice || product.price || 0) *
+                    Number(
+                        product.offerPrice ||
+                            product.price ||
+                            0
+                    ) *
                         Number(quantity || 0)
                 );
             },
@@ -214,35 +289,11 @@ export const AppContextProvider = ({ children }) => {
     };
 
     /* =========================================================
-       USER EFFECT
+       USER
     ========================================================= */
 
     useEffect(() => {
-        if (user) {
-            fetchUserData();
-        } else {
-            setUserData(false);
-            setIsSeller(false);
-        }
-    }, [user]);
-
-    /* =========================================================
-       GUEST CART
-    ========================================================= */
-
-    useEffect(() => {
-        if (!user) {
-            try {
-                const guestCart = JSON.parse(
-                    localStorage.getItem("guestCart") || "{}"
-                );
-
-                setCartItems(guestCart);
-            } catch (error) {
-                console.error("GUEST CART ERROR:", error);
-                setCartItems({});
-            }
-        }
+        fetchUserData();
     }, [user]);
 
     /* =========================================================
@@ -261,18 +312,25 @@ export const AppContextProvider = ({ children }) => {
         currency,
         router,
         user,
+
         products,
         setProducts,
+
         userData,
         setUserData,
+
         isSeller,
         setIsSeller,
+
         cartItems,
         setCartItems,
+
         addToCart,
         updateCartQuantity,
+
         getCartCount,
         getCartAmount,
+
         fetchProductData,
         fetchUserData,
     };

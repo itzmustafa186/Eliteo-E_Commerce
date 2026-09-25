@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
@@ -259,4 +259,4 @@ const ProductCard = ({ product }) => {
   );
 };
 
-export default memo(ProductCard);
+export default ProductCard;

@@ -34,6 +34,36 @@ const ProductDetailsClient = ({
 
   const [mainImage, setMainImage] = useState(null);
 
+  if (!productData) {
+    return (
+      <>
+        <Navbar />
+
+        <main className="flex min-h-screen items-center justify-center bg-[#FAF8F4]">
+          <div className="text-center">
+            <h1 className="text-2xl font-semibold text-[#172033]">
+              Product not found
+            </h1>
+
+            <p className="mt-2 text-sm text-[#687080]">
+              The product you are looking for does not exist.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => router.push("/all-products")}
+              className="mt-6 rounded-xl bg-[#9B7A42] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#856631]"
+            >
+              Browse Products
+            </button>
+          </div>
+        </main>
+
+        <Footer />
+      </>
+    );
+  }
+
   // =========================================================
   // SAFE PRODUCT
   // =========================================================
@@ -156,35 +186,7 @@ const ProductDetailsClient = ({
   // This return is AFTER ALL HOOKS.
   // Therefore it cannot break hook order.
 
-  if (!productData) {
-    return (
-      <>
-        <Navbar />
-
-        <main className="flex min-h-screen items-center justify-center bg-[#FAF8F4]">
-          <div className="text-center">
-            <h1 className="text-2xl font-semibold text-[#172033]">
-              Product not found
-            </h1>
-
-            <p className="mt-2 text-sm text-[#687080]">
-              The product you are looking for does not exist.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => router.push("/all-products")}
-              className="mt-6 rounded-xl bg-[#9B7A42] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#856631]"
-            >
-              Browse Products
-            </button>
-          </div>
-        </main>
-
-        <Footer />
-      </>
-    );
-  }
+  
 
   // =========================================================
   // RENDER
