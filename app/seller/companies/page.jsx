@@ -13,8 +13,6 @@ export default function CompaniesPage() {
 
     const loadCompanies = async () => {
         try {
-            setFetching(true);
-
             const result = await getCompanies();
 
             if (result.success) {
@@ -27,9 +25,7 @@ export default function CompaniesPage() {
         }
     };
 
-    useEffect(() => {
-        loadCompanies();
-    }, []);
+   
 
     const handleLogoChange = (e) => {
         const file = e.target.files?.[0];
@@ -86,6 +82,11 @@ export default function CompaniesPage() {
             setLoading(false);
         }
     };
+
+     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadCompanies();
+    }, []);
 
     return (
         <div className="min-h-screen bg-[#f8f8f7] p-4 md:p-8">

@@ -1,8 +1,8 @@
 import "./globals.css";
-import { AppContextProvider } from "@/context/AppContext";
 import { Toaster } from "react-hot-toast";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Poppins } from "next/font/google";
+import AppContextProvider from "@/context/AppContext";
 
 export const metadata = {
   metadataBase: new URL("https://www.eliteo.pk"),
@@ -26,8 +26,6 @@ export const metadata = {
 
   creator: "Eliteo",
   publisher: "Eliteo",
-
-
 
   alternates: {
     canonical: "https://www.eliteo.pk",
@@ -75,14 +73,10 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en-PK">
-        <body
-          className={`${poppins.className} antialiased text-gray-700`}
-        >
+        <body className={`${poppins.className} antialiased text-gray-700`}>
           <Toaster />
 
-          <AppContextProvider>
-            {children}
-          </AppContextProvider>
+          <AppContextProvider>{children}</AppContextProvider>
         </body>
       </html>
     </ClerkProvider>

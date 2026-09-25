@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import HeaderSlider from "@/components/HeaderSlider";
 import HomeProducts from "@/components/HomeProducts";
 import FeaturedProduct from "@/components/FeaturedProduct";
-
+import Company from "@/models/Company";
 import Carousel from "@/models/Carousel";
 import CategorySection from "@/components/CategorySection";
 import HeadlineSection from "@/components/HeadlineSection";

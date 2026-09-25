@@ -18,74 +18,69 @@ const categorySlugs = {
 };
 
 const ProductCard = ({ product }) => {
-  const { currency } = useAppContext();
+  const context = useAppContext();
+  const currency = context?.currency || "Rs.";
 
-  if (!product) return null;
-
-  const isOutOfStock = Number(product.stock || 0) <= 0;
+  if (!product) {
+    return null;
+  }
 
   const price = Number(product.price || 0);
   const offerPrice = Number(product.offerPrice || 0);
+  const stock = Number(product.stock || 0);
+
+  const isOutOfStock = stock <= 0;
 
   const discount =
     price > 0 && offerPrice > 0 && offerPrice < price
       ? Math.round(((price - offerPrice) / price) * 100)
       : 0;
 
+  // Safely extract category string vs object
+  const categoryName =
+    typeof product.category === "string"
+      ? product.category
+      : product.category?.name || "";
+
   const categorySlug =
-    categorySlugs[product.category] ||
-    product.category?.toLowerCase().replace(/\s+/g, "-");
+    categorySlugs[categoryName] ||
+    product.category?.slug ||
+    (categoryName ? categoryName.toLowerCase().replace(/\s+/g, "-") : "");
 
   const company =
     product.company && typeof product.company === "object"
       ? product.company
       : null;
 
-  const productImage = product.images?.[0];
+  const productImage = product.images?.[0] || null;
+  const productSlug = product.slug || "#";
 
   return (
     <div
-      className={`
-                group relative flex h-full flex-col
-                overflow-hidden rounded-3xl
-                border border-[#EAE5DB]
-                bg-white
-                transition-all duration-300
-                ${
-                  !isOutOfStock
-                    ? "hover:-translate-y-1 hover:border-[#D8C29A] hover:shadow-[0_10px_25px_rgba(23,32,51,0.08)]"
-                    : ""
-                }
-            `}
+      className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#EAE5DB] bg-white transition-all duration-300 ${
+        !isOutOfStock
+          ? "hover:-translate-y-1 hover:border-[#D8C29A] hover:shadow-[0_10px_25px_rgba(23,32,51,0.08)]"
+          : ""
+      }`}
     >
-      {/* ================= IMAGE ================= */}
-
-      {/* ================= IMAGE ================= */}
-
-      <Link href={`/product/${product.slug}`}>
+      {/* IMAGE */}
+      <Link href={`/product/${productSlug}`}>
         <div
-          className={`
-            relative aspect-square overflow-hidden
-            bg-[#F7F4EE]
-            ${isOutOfStock ? "grayscale-[15%]" : ""}
-        `}
+          className={`relative aspect-square overflow-hidden bg-[#F7F4EE] ${
+            isOutOfStock ? "grayscale-[15%]" : ""
+          }`}
         >
           {/* DISCOUNT */}
-          {/* DISCOUNT + COMPANY */}
-
           {!isOutOfStock && discount > 0 && (
             <span className="absolute left-3 top-3 z-20 rounded-md bg-[#172033] px-2 py-1 text-[9px] font-semibold tracking-wide text-white">
               -{discount}%
             </span>
           )}
 
-          {/* COMPANY LOGO + NAME */}
-
+          {/* COMPANY */}
           {company?.name && (
             <div className="absolute right-3 top-3 z-20 max-w-[55%]">
               <div className="flex items-center gap-1.5 rounded-full border border-[#E8E1D6] bg-white/95 px-2 py-1.5 shadow-sm backdrop-blur-sm">
-                {/* LOGO */}
-
                 {company.logo ? (
                   <div className="relative h-5 w-5 shrink-0 overflow-hidden rounded-full bg-white">
                     <Image
@@ -102,8 +97,6 @@ const ProductCard = ({ product }) => {
                   </div>
                 )}
 
-                {/* COMPANY NAME */}
-
                 <span className="max-w-[80px] truncate text-[9px] font-semibold text-[#172033]">
                   {company.name}
                 </span>
@@ -112,18 +105,13 @@ const ProductCard = ({ product }) => {
           )}
 
           {/* PRODUCT IMAGE */}
-
           {productImage ? (
             <div className="absolute inset-0 flex items-center justify-center p-5">
               <Image
                 src={productImage}
                 alt={product.name || "Product"}
                 fill
-                sizes="
-                        (max-width: 640px) 50vw,
-                        (max-width: 1024px) 33vw,
-                        25vw
-                    "
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className="object-contain transition-transform duration-500 group-hover:scale-105"
               />
             </div>
@@ -134,7 +122,6 @@ const ProductCard = ({ product }) => {
           )}
 
           {/* OUT OF STOCK */}
-
           {isOutOfStock && (
             <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/30">
               <span className="rounded-md bg-[#172033] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-wide text-white">
@@ -145,29 +132,24 @@ const ProductCard = ({ product }) => {
         </div>
       </Link>
 
-      {/* ================= CONTENT ================= */}
-
+      {/* CONTENT */}
       <div className="flex flex-1 flex-col p-3">
         {/* CATEGORY */}
-
-        {product.category && (
+        {categoryName && (
           <Link
             href={`/category/${categorySlug}`}
             className="mb-1.5 text-[9px] font-medium uppercase tracking-[0.14em] text-[#9B7A42] transition hover:text-[#172033]"
           >
-            {product.category}
+            {categoryName}
           </Link>
         )}
 
-        {/* ================= COMPANY / BRAND ================= */}
-
+        {/* COMPANY */}
         {company?.name && (
           <Link
-            href={`/category/${categorySlug}?company=${company.slug}`}
+            href={`/category/${categorySlug}?company=${company.slug || ""}`}
             className="mb-2 flex w-fit max-w-full items-center gap-1.5 rounded-md border border-[#EAE5DB] bg-[#FCFBF8] px-1.5 py-1 transition hover:border-[#D8C29A] hover:bg-[#F7F3EA]"
           >
-            {/* COMPANY LOGO */}
-
             {company.logo ? (
               <div className="relative h-5 w-5 shrink-0 overflow-hidden rounded bg-white">
                 <Image
@@ -184,27 +166,30 @@ const ProductCard = ({ product }) => {
               </div>
             )}
 
-            {/* COMPANY NAME */}
-
             <span className="max-w-[110px] truncate text-[10px] font-semibold text-[#555B65]">
               {company.name}
             </span>
           </Link>
         )}
 
-        {/* ================= PRODUCT NAME ================= */}
-
-        <Link href={`/product/${product.slug}`}>
+        {/* PRODUCT NAME */}
+        <Link href={`/product/${productSlug}`}>
           <h3 className="line-clamp-2 min-h-[36px] text-xs font-semibold leading-[18px] text-[#172033] transition-colors group-hover:text-[#9B7A42] sm:text-sm">
             {product.name}
           </h3>
         </Link>
 
-        {/* ================= RATING ================= */}
-
+        {/* RATING */}
         <div className="mt-2 flex items-center gap-1.5">
           <div className="flex items-center gap-1 rounded bg-[#F7F3EA] px-1.5 py-0.5">
-            <Image src={assets.star_icon} alt="Rating" width={11} height={11} />
+            {assets?.star_icon && (
+              <Image
+                src={assets.star_icon}
+                alt="Rating"
+                width={11}
+                height={11}
+              />
+            )}
 
             <span className="text-[9px] font-semibold text-[#8A6A36]">
               {product.rating || 0}
@@ -216,44 +201,33 @@ const ProductCard = ({ product }) => {
           </span>
         </div>
 
-        {/* ================= PRICE ================= */}
-
+        {/* PRICE */}
         <div className="mt-2.5 flex items-baseline gap-1.5">
           <span className="text-base font-bold tracking-tight text-[#172033] sm:text-lg">
-            {currency}
-            {offerPrice.toLocaleString()}
+            {currency} {offerPrice.toLocaleString()}
           </span>
 
           {price > offerPrice && (
             <span className="text-[10px] text-[#9A9DA4] line-through">
-              {currency}
-              {price.toLocaleString()}
+              {currency} {price.toLocaleString()}
             </span>
           )}
         </div>
 
-        {/* ================= BUTTON ================= */}
-
+        {/* BUTTON */}
         <Link
-          href={`/product/${product.slug}`}
-          className={`
-                        mt-3 flex w-full items-center justify-center
-                        rounded-md py-2
-                        text-[10px] font-semibold
-                        transition-all sm:text-xs
-                        ${
-                          isOutOfStock
-                            ? "pointer-events-none bg-[#F1EEE8] text-[#9A9DA4]"
-                            : "bg-[#172033] !text-white hover:bg-[#9B7A42]"
-                        }
-                    `}
+          href={`/product/${productSlug}`}
+          className={`mt-3 flex w-full items-center justify-center rounded-md py-2 text-[10px] font-semibold transition-all sm:text-xs ${
+            isOutOfStock
+              ? "pointer-events-none bg-[#F1EEE8] text-[#9A9DA4]"
+              : "bg-[#172033] !text-white hover:bg-[#9B7A42]"
+          }`}
         >
           {isOutOfStock ? "Out of Stock" : "View Product"}
         </Link>
       </div>
 
-      {/* ================= HOVER BORDER ================= */}
-
+      {/* HOVER BORDER */}
       <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-transparent transition-all duration-300 group-hover:ring-[#C8A96B]/40" />
     </div>
   );
