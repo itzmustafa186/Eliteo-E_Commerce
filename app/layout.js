@@ -1,3 +1,9 @@
+import "./globals.css";
+import { Toaster } from "react-hot-toast";
+import { ClerkProvider } from "@clerk/nextjs";
+import { Poppins } from "next/font/google";
+import AppContextProvider from "@/context/AppContext";
+
 export const metadata = {
   metadataBase: new URL("https://eliteo.pk"),
 
@@ -57,3 +63,22 @@ export const metadata = {
     apple: "/favicon.ico",
   },
 };
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+export default function RootLayout({ children }) {
+  return (
+    <ClerkProvider>
+      <html lang="en-PK">
+        <body className={`${poppins.className} antialiased text-gray-700`}>
+          <Toaster />
+
+          <AppContextProvider>{children}</AppContextProvider>
+        </body>
+      </html>
+    </ClerkProvider>
+  );
+}
