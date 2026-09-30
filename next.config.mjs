@@ -14,6 +14,22 @@ const nextConfig = {
       },
     ],
   },
+
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "eliteo.pk",
+          },
+        ],
+        destination: "https://www.eliteo.pk/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
