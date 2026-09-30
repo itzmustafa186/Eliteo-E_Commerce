@@ -1,11 +1,5 @@
-import "./globals.css";
-import { Toaster } from "react-hot-toast";
-import { ClerkProvider } from "@clerk/nextjs";
-import { Poppins } from "next/font/google";
-import AppContextProvider from "@/context/AppContext";
-
 export const metadata = {
-  metadataBase: new URL("https://www.eliteo.pk"),
+  metadataBase: new URL("https://eliteo.pk"),
 
   title: {
     default: "Eliteo | Mobile & Tech Accessories in Pakistan",
@@ -20,7 +14,7 @@ export const metadata = {
   authors: [
     {
       name: "Eliteo",
-      url: "https://www.eliteo.pk",
+      url: "https://eliteo.pk",
     },
   ],
 
@@ -28,13 +22,13 @@ export const metadata = {
   publisher: "Eliteo",
 
   alternates: {
-    canonical: "https://www.eliteo.pk",
+    canonical: "https://eliteo.pk",
   },
 
   openGraph: {
     type: "website",
     locale: "en_PK",
-    url: "https://www.eliteo.pk",
+    url: "https://eliteo.pk",
     siteName: "Eliteo",
     title: "Eliteo | Mobile & Tech Accessories in Pakistan",
     description:
@@ -63,22 +57,3 @@ export const metadata = {
     apple: "/favicon.ico",
   },
 };
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-});
-
-export default function RootLayout({ children }) {
-  return (
-    <ClerkProvider>
-      <html lang="en-PK">
-        <body className={`${poppins.className} antialiased text-gray-700`}>
-          <Toaster />
-
-          <AppContextProvider>{children}</AppContextProvider>
-        </body>
-      </html>
-    </ClerkProvider>
-  );
-}

@@ -4,7 +4,7 @@ import ProductDetailsClient from "@/components/ProductDetailsClient";
 import { notFound } from "next/navigation";
 import Review from "@/models/review";
 
-const baseUrl = "https://www.eliteo.pk";
+const baseUrl = "https://eliteo.pk";
 
 // ======================================================
 // HELPER — SERIALIZE PRODUCT

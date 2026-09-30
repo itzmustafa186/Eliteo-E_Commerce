@@ -13,7 +13,7 @@ import WhyChooseEliteo from "@/components/WhyChooseEliteo";
 
 export const revalidate = 60;
 
-const baseUrl = "https://www.eliteo.pk";
+const baseUrl = "https://eliteo.pk";
 
 export default async function Home() {
   await connectDB();

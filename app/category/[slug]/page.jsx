@@ -7,7 +7,7 @@ import Link from "next/link";
 import CategoryProducts from "@/components/CategoryProducts";
 import { notFound } from "next/navigation";
 
-const baseUrl = "https://www.eliteo.pk";
+const baseUrl = "https://eliteo.pk";
 
 const categoryMap = {
     earbuds: "Earbuds",

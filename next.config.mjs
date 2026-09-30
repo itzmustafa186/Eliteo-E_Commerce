@@ -22,10 +22,10 @@ const nextConfig = {
         has: [
           {
             type: "host",
-            value: "eliteo.pk",
+            value: "www.eliteo.pk",
           },
         ],
-        destination: "https://www.eliteo.pk/:path*",
+        destination: "https://eliteo.pk/:path*",
         permanent: true,
       },
     ];

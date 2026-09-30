@@ -2,7 +2,7 @@ import connectDB from "@/config/db";
 import Product from "@/models/product";
 
 export default async function sitemap() {
-    const baseUrl = "https://www.eliteo.pk";
+    const baseUrl = "https://eliteo.pk";
 
     await connectDB();
 
