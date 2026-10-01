@@ -7,6 +7,30 @@ import Review from "@/models/review";
 const baseUrl = "https://eliteo.pk";
 
 // ======================================================
+// ISR
+// ======================================================
+
+export const revalidate = 60;
+
+// ======================================================
+// GENERATE STATIC PRODUCT PAGES
+// ======================================================
+
+export async function generateStaticParams() {
+    await connectDB();
+
+    const products = await Product.find({
+        isActive: true,
+    })
+        .select("slug")
+        .lean();
+
+    return products.map((product) => ({
+        slug: product.slug,
+    }));
+}
+
+// ======================================================
 // HELPER — SERIALIZE PRODUCT
 // ======================================================
 
@@ -71,7 +95,7 @@ export async function generateMetadata({ params }) {
 
     const imageUrl =
         product.images?.[0] ||
-        `${baseUrl}/og-image.jpg`;
+        `${baseUrl}/opengraph.png`;
 
     return {
         title: `Buy ${product.name} Online in Pakistan`,
@@ -201,7 +225,7 @@ export default async function ProductPage({ params }) {
 
     const imageUrl =
         productData.images?.[0] ||
-        `${baseUrl}/og-image.jpg`;
+        `${baseUrl}/opengraph.png`;
 
     const price =
         productData.offerPrice || productData.price;

@@ -37,7 +37,7 @@ const WhyChooseEliteo = () => {
     ];
 
     return (
-        <section className="w-full bg-[#FCFBF8] py-20 md:py-24">
+        <section className="w-full bg-[#FCFBF8] py-5 md:py-10">
 
             <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
 
@@ -69,7 +69,7 @@ const WhyChooseEliteo = () => {
 
 
                 {/* Features */}
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 ">
 
                     {features.map((feature, index) => {
                         const Icon = feature.icon;
@@ -83,7 +83,7 @@ const WhyChooseEliteo = () => {
                                     border
                                     border-[#E8E1D6]
                                     bg-white
-                                    p-7
+                                    p-2
                                     text-center
                                     transition-all
                                     duration-300
