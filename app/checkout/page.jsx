@@ -54,7 +54,7 @@ export default function CheckoutPage() {
 
                 {/* Header */}
 
-                <section className="border-b border-[#e8e1d6] bg-white">
+                {/* <section className="border-b border-[#e8e1d6] bg-white">
 
                     <div className="mx-auto w-full max-w-[1100px] px-5 py-10 sm:px-8 lg:px-10">
 
@@ -72,7 +72,7 @@ export default function CheckoutPage() {
 
                     </div>
 
-                </section>
+                </section> */}
 
 
                 {/* Checkout */}
